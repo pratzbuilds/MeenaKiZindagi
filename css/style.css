@@ -43,75 +43,74 @@ body{
 .boot-gullak{font-size:64px; animation:bob 1s ease-in-out infinite;}
 @keyframes bob{50%{transform:translateY(-8px);}}
 
-/* ---------- top bar: meters ---------- */
+/* ---------- top bar: year progress + meters ---------- */
 .topbar{
   position:sticky; top:0; z-index:20;
   background:var(--peacock);
   color:#fff;
-  padding:10px 12px 12px;
+  padding:10px 12px 14px;
   border-bottom:4px solid var(--haldi);
 }
-.topbar-row{display:flex; align-items:center; gap:8px;}
-.year-chip{
-  font-family:var(--font-display); font-weight:800;
-  background:var(--haldi); color:var(--ink);
-  border-radius:999px; padding:2px 12px; font-size:14px; white-space:nowrap;
+.yearbar{margin-bottom:8px;}
+.yearbar-track{
+  position:relative; height:10px; background:rgba(255,255,255,.22);
+  border-radius:6px; overflow:visible;
 }
+.yearbar-fill{
+  height:100%; border-radius:6px;
+  background:linear-gradient(90deg,var(--haldi),#FFD166);
+  transition:width .6s cubic-bezier(.34,1.56,.64,1);
+}
+.yr-dot{
+  position:absolute; top:50%; width:10px; height:10px; margin-left:-5px;
+  transform:translateY(-50%); border-radius:50%;
+  background:rgba(255,255,255,.35); border:2px solid var(--peacock);
+}
+.yr-dot.done{background:var(--rani); border-color:#fff;}
+.yearbar-label{font-family:var(--font-display); font-weight:700; font-size:13px; margin-top:6px; opacity:.95;}
+.topbar-row{display:flex; align-items:center; gap:8px; margin-top:2px;}
 .money-chip{
-  font-family:var(--font-display); font-weight:700; font-size:15px;
-  margin-left:auto; white-space:nowrap;
+  font-family:var(--font-display); font-weight:800; font-size:17px;
+  background:rgba(255,255,255,.15); padding:4px 12px; border-radius:999px;
 }
 .money-chip.debt{color:#FFB4A2;}
 .iconbtn{
   background:rgba(255,255,255,.15); border:none; color:#fff;
-  border-radius:10px; width:34px; height:34px; font-size:16px; cursor:pointer;
+  border-radius:10px; width:36px; height:36px; font-size:17px; cursor:pointer;
+  margin-left:auto;
 }
-.meters{display:flex; gap:10px; margin-top:8px;}
-.meter{flex:1;}
-.meter label{font-size:11px; display:flex; justify-content:space-between; opacity:.9;}
-.meter .bar{
-  height:10px; border-radius:6px; background:rgba(255,255,255,.25); overflow:hidden; margin-top:2px;
-}
-.meter .fill{height:100%; border-radius:6px; transition:width .6s cubic-bezier(.34,1.56,.64,1);}
-.fill.health{background:#7BD389;}
-.fill.tension{background:#FF9B85;}
-.fill.suraksha{background:#FFD166;}
+.iconbtn + .iconbtn{ margin-left:6px; }
 
-/* ---------- gullak (signature) ---------- */
-.gullak-wrap{display:flex; align-items:flex-end; gap:10px; margin-top:8px;}
-.gullak{
-  width:52px; height:46px; position:relative; flex:none;
-  filter:drop-shadow(0 3px 3px rgba(0,0,0,.3));
-}
-.gullak .pot{
-  position:absolute; inset:0;
-  background:#C96F33;
-  border-radius:50% 50% 46% 46% / 62% 62% 40% 40%;
-  overflow:hidden;
-  border-bottom:4px solid #9A4E1E;
-}
-.gullak .pot::before{ /* coin slot */
-  content:""; position:absolute; top:6px; left:50%; transform:translateX(-50%);
-  width:20px; height:4px; background:#7A3B14; border-radius:3px;
-}
-.gullak .level{
-  position:absolute; bottom:0; left:0; right:0;
-  background:linear-gradient(#FFD166,#F5A800);
-  transition:height .8s ease;
-}
-.gullak .coin{
-  position:absolute; top:-14px; left:50%; width:14px; height:14px;
-  margin-left:-7px; border-radius:50%;
-  background:radial-gradient(circle at 35% 35%, #FFE28A, #E0A100);
-  opacity:0; pointer-events:none;
-}
-.gullak.drop .coin{animation:coindrop .7s ease forwards;}
-@keyframes coindrop{
+/* ---------- BIG gullak (signature element) ---------- */
+.gullak-wrap{display:flex; align-items:center; gap:14px; margin-top:12px;}
+.gullak-big{width:88px; height:80px; flex:none; filter:drop-shadow(0 4px 4px rgba(0,0,0,.35));}
+.gullak-svg{width:100%; height:100%; overflow:visible;}
+.gk-level{transition:height .8s ease, y .8s ease;}
+.coin-drop{opacity:0;}
+.coin-drop.anim{animation:coinfall .7s ease forwards;}
+@keyframes coinfall{
   0%{opacity:1; transform:translateY(0);}
-  80%{opacity:1; transform:translateY(26px);}
-  100%{opacity:0; transform:translateY(30px);}
+  75%{opacity:1; transform:translateY(58px);}
+  100%{opacity:0; transform:translateY(62px);}
 }
-.gullak-info{font-size:11px; color:#fff; opacity:.9; line-height:1.4;}
+.gullak-amt{
+  font-family:var(--font-display); font-weight:800; font-size:22px; color:#fff;
+  line-height:1.15;
+}
+.gullak-amt span{display:block; font-family:var(--font-body); font-weight:500; font-size:12px; opacity:.85;}
+
+/* ---------- BIG meters ---------- */
+.meters-big{display:flex; gap:8px; margin-top:12px;}
+.meter-big{flex:1; background:rgba(255,255,255,.1); border-radius:12px; padding:6px 8px;}
+.meter-top{display:flex; align-items:center; justify-content:space-between;}
+.meter-icon{font-size:16px;}
+.meter-num{font-family:var(--font-display); font-weight:800; font-size:17px; color:#fff;}
+.bar-big{height:12px; border-radius:7px; background:rgba(255,255,255,.25); overflow:hidden; margin-top:4px;}
+.fill-big{height:100%; border-radius:7px; transition:width .6s cubic-bezier(.34,1.56,.64,1);}
+.fill-big.health{background:#7BD389;}
+.fill-big.tension{background:#FF9B85;}
+.fill-big.suraksha{background:#FFD166;}
+.meter-big label{display:block; font-size:11px; color:#fff; opacity:.85; margin-top:3px; text-align:center;}
 
 /* ---------- main scroll area ---------- */
 .stage{flex:1; padding:16px 14px 110px; overflow-y:auto;}

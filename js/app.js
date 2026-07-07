@@ -17,10 +17,16 @@
   const app = document.getElementById("app");
 
   /* ---------------- i18n ---------------- */
+  function charFirstName() {
+    if (!S || !S.charId) return L["char.meena.n"] ? L["char.meena.n"].split(",")[0] : "Meena";
+    const full = L["char." + S.charId + ".n"] || "";
+    return full.split(",")[0].trim();
+  }
   function t(key, vars) {
     let s = L[key];
     if (s === undefined) s = key; // fail visible, not silent
-    if (vars) for (const k in vars) s = s.split("{" + k + "}").join(vars[k]);
+    const merged = Object.assign({ name: charFirstName() }, vars || {});
+    for (const k in merged) s = s.split("{" + k + "}").join(merged[k]);
     return s;
   }
   function rupees(n) {
@@ -239,12 +245,25 @@
 
   /* ---------------- rendering ---------------- */
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+  function yearBarHTML() {
+    const markers = STORY.chapters.map(c => c.year);
+    const pct = Math.min(100, Math.round((S.year - 1) / 19 * 100));
+    const dots = markers.map(y => {
+      const p = Math.round((y - 1) / 19 * 100);
+      const state = S.year >= y ? "done" : "todo";
+      return `<span class="yr-dot ${state}" style="left:${p}%"></span>`;
+    }).join("");
+    return `<div class="yearbar">
+      <div class="yearbar-track"><div class="yearbar-fill" style="width:${pct}%"></div>${dots}</div>
+      <div class="yearbar-label">${esc(t("ui.year"))} ${S.year} / 20</div>
+    </div>`;
+  }
   function topbarHTML() {
     const gLevel = Math.min(100, Math.round(totalAssets() / (12 * monthlyExpense()) * 100));
     return `
     <div class="topbar">
+      ${yearBarHTML()}
       <div class="topbar-row">
-        <span class="year-chip">${esc(t("ui.year"))} ${S.year}/20</span>
         <span class="money-chip ${S.debt > 0 ? "debt" : ""}">
           ${S.debt > 0 ? esc(t("ui.debt")) + " " + rupees(S.debt) : rupees(totalAssets())}
         </span>
@@ -252,19 +271,30 @@
         <button class="iconbtn" id="resetBtn" aria-label="reset">↺</button>
       </div>
       <div class="gullak-wrap">
-        <div class="gullak" id="gullak"><div class="pot"><div class="level" style="height:${gLevel}%"></div></div><div class="coin"></div></div>
-        <div class="meters">
-          ${meterHTML("sehat", "health", S.health)}
-          ${meterHTML("tension", "tension", S.tension)}
-          ${meterHTML("suraksha", "suraksha", surakshaScore())}
+        <div class="gullak-big" id="gullak">
+          <svg viewBox="0 0 120 110" class="gullak-svg">
+            <path d="M14 92 Q8 50 60 46 Q112 50 106 92 Z" fill="#C96F33" stroke="#2E1E12" stroke-width="4"/>
+            <clipPath id="gkclip"><path d="M14 92 Q8 50 60 46 Q112 50 106 92 Z"/></clipPath>
+            <rect x="8" y="${92 - 46 * gLevel / 100}" width="104" height="${46 * gLevel / 100}" fill="#F5A800" class="gk-level" clip-path="url(#gkclip)"/>
+            <rect x="48" y="50" width="24" height="6" rx="3" fill="#3A1F0D"/>
+            <circle class="coin-drop" cx="60" cy="10" r="8" fill="#FFD166" stroke="#B27600" stroke-width="2" opacity="0"/>
+          </svg>
         </div>
+        <div class="gullak-amt">${rupees(totalAssets())}<span>${esc(t("ui.gullak"))}</span></div>
       </div>
-      <div class="gullak-info">${esc(t("ui.gullak"))}: ${rupees(totalAssets())}</div>
+      <div class="meters-big">
+        ${meterHTML("sehat", "health", S.health, "❤️")}
+        ${meterHTML("tension", "tension", S.tension, "😰")}
+        ${meterHTML("suraksha", "suraksha", surakshaScore(), "🛡️")}
+      </div>
     </div>`;
   }
-  function meterHTML(labelKey, cls, val) {
-    return `<div class="meter"><label>${esc(t("ui." + labelKey))}<span>${Math.round(val)}</span></label>
-      <div class="bar"><div class="fill ${cls}" style="width:${val}%"></div></div></div>`;
+  function meterHTML(labelKey, cls, val, icon) {
+    return `<div class="meter-big">
+      <div class="meter-top"><span class="meter-icon">${icon}</span><span class="meter-num">${Math.round(val)}</span></div>
+      <div class="bar-big"><div class="fill-big ${cls}" style="width:${val}%"></div></div>
+      <label>${esc(t("ui." + labelKey))}</label>
+    </div>`;
   }
   function shell(inner, buttonLabel, onButton, secondary) {
     app.innerHTML = topbarHTML() + `<div class="stage">${inner}</div>` +
@@ -282,8 +312,11 @@
     if (r) r.onclick = () => { if (confirm(t("ui.reset"))) { localStorage.removeItem(SAVE_KEY); location.reload(); } };
   }
   function coinDrop() {
-    const g = document.getElementById("gullak");
-    if (g) { g.classList.remove("drop"); void g.offsetWidth; g.classList.add("drop"); }
+    const g = document.querySelector("#gullak .coin-drop");
+    if (g) {
+      g.classList.remove("anim"); void g.getBBox();
+      g.classList.add("anim");
+    }
     sfx.coin();
   }
 
@@ -467,9 +500,15 @@
     return sc.options.filter(o =>
       !(o.hideIfFlag && S.flags[o.hideIfFlag]) && !(o.needFlag && !S.flags[o.needFlag]));
   }
+  function screenApplies(sc) {
+    if (sc.showIfFlag && !S.flags[sc.showIfFlag]) return false;
+    if (sc.hideIfFlag && S.flags[sc.hideIfFlag]) return false;
+    return true;
+  }
 
   function renderScreen() {
     const ch = chapter();
+    while (S.screenIdx < ch.screens.length && !screenApplies(ch.screens[S.screenIdx])) S.screenIdx++;
     if (S.screenIdx >= ch.screens.length) { S.phase = "timepass"; return route(); }
     const sc = ch.screens[S.screenIdx];
     const opts = visibleOptions(sc);
@@ -542,8 +581,13 @@
   /* ---------------- illustrated stage (the scene IS the game) ----------------
      Flat, warm, chawl-wall style. An artist can later replace this whole
      function's output with hand-drawn images — see DESIGN_BRIEF.md. */
+  const CHAR_LOOK = {
+    meena:  { saris: ["#D6336C", "#146B6A", "#7A4B94", "#B3402A"], skin: "#C68B59" },
+    sunita: { saris: ["#146B6A", "#D6336C", "#E4573D", "#3D6B99"], skin: "#DDA36B" },
+    rekha:  { saris: ["#7A4B94", "#4C8C2B", "#B3402A", "#8a5a2b"], skin: "#A9714A" }
+  };
   function svgWoman(x, y, sc, o) {
-    const ink = "#2E1E12", skin = "#C68B59";
+    const ink = "#2E1E12", skin = o.skin || "#C68B59";
     let g = `<g transform="translate(${x},${y}) scale(${sc})">`;
     g += `<path d="M-17 0 Q0 4 17 0 L23 46 Q0 52 -23 46 Z" fill="${o.sari}" stroke="${ink}" stroke-width="2.5"/>`;
     g += `<path d="M-13 -26 L13 -26 L17 2 L-17 2 Z" fill="${o.blouse}" stroke="${ink}" stroke-width="2.5"/>`;
@@ -621,9 +665,9 @@
     if (S.flags.widowed) s += `<g><ellipse cx="152" cy="84" rx="9" ry="4.5" fill="#C96F33" stroke="${ink}" stroke-width="2"/><path d="M152 78 q-3.4 -7 0 -11 q3.4 4 0 11" fill="#F5A800" stroke="#E4573D" stroke-width="1.4"/></g>`;
     // family
     const ageIdx = yr <= 3 ? 0 : yr <= 8 ? 1 : yr <= 14 ? 2 : 3;
-    const saris = ["#D6336C", "#146B6A", "#7A4B94", "#B3402A"];
+    const look = CHAR_LOOK[S.charId] || CHAR_LOOK.meena;
     s += svgWoman(84, 152, 1.28, {
-      sari: saris[ageIdx], blouse: "#F5A800",
+      sari: look.saris[ageIdx], blouse: "#F5A800", skin: look.skin,
       hair: ageIdx >= 3 ? "#5d4d3d" : "#1d1108", grey: ageIdx >= 2,
       smile: tone !== "bad"
     });

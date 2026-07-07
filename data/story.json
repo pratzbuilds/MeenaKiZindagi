@@ -1,297 +1,1186 @@
 {
   "_README": "This file is the game's LOGIC. Words live in data/lang/*.json. Numbers here are in rupees. 'monthly' amounts repeat every month. 'drain' takes money every month (negative monthly = extra income). 'autosave' puts money into a pot every month. Pots: cash, rd, sip, ssy, gold, chit, endowment, scam. See EDIT_GUIDE.md.",
-
   "config": {
-    "rates":   { "cash": 0.0, "cashInBank": 0.04, "rd": 0.067, "sip": 0.12, "ssy": 0.082, "gold": 0.07, "chit": 0.0, "endowment": 0.045, "scam": 0.0 },
+    "rates": {
+      "cash": 0.0,
+      "cashInBank": 0.04,
+      "rd": 0.067,
+      "sip": 0.12,
+      "ssy": 0.082,
+      "gold": 0.07,
+      "chit": 0.0,
+      "endowment": 0.045,
+      "scam": 0.0
+    },
     "sipSwing": 0.08,
-    "debtRate": 0.30,
+    "debtRate": 0.3,
     "expenseShare": 0.55,
     "chitCollapseChance": 0.35,
     "chitCollapseYear": 4
   },
-
   "characters": [
-    { "id": "meena",  "emoji": "👩‍🏭" },
-    { "id": "sunita", "emoji": "💇‍♀️" },
-    { "id": "rekha",  "emoji": "🧹" }
+    {
+      "id": "meena",
+      "emoji": "👩‍🏭"
+    },
+    {
+      "id": "sunita",
+      "emoji": "💇‍♀️"
+    },
+    {
+      "id": "rekha",
+      "emoji": "🧹"
+    }
   ],
-
   "incomes": [
-    { "personal": 10000, "household": 25000 },
-    { "personal": 15000, "household": 35000 },
-    { "personal": 22000, "household": 45000 }
+    {
+      "personal": 10000,
+      "household": 25000
+    },
+    {
+      "personal": 15000,
+      "household": 35000
+    },
+    {
+      "personal": 22000,
+      "household": 45000
+    }
   ],
-
   "chapters": [
     {
-      "id": "ch1", "year": 1,
+      "id": "ch1",
+      "year": 1,
       "screens": [
-        { "id": "c1s1", "type": "decision", "emoji": "📱",
-          "learnmore": { "key": "lm.efund", "video": "https://www.youtube.com/results?search_query=emergency+fund+kaise+banaye+hindi" },
+        {
+          "id": "c1s1",
+          "type": "decision",
+          "emoji": "📱",
+          "learnmore": {
+            "key": "lm.efund",
+            "video": "https://www.youtube.com/results?search_query=emergency+fund+kaise+banaye+hindi"
+          },
           "options": [
-            { "id": "o1", "emoji": "🤩", "costLabel": "₹1,200 × 24 mah", "tone": "bad",
-              "effects": { "drain": { "monthly": 1200, "years": 2 }, "tension": 5, "flags": { "phoneEMI": true } } },
-            { "id": "o2", "emoji": "🪔", "costLabel": "₹500/mah gullak", "tone": "good",
-              "effects": { "autosave": { "target": "cash", "monthly": 500 } } },
-            { "id": "o3", "emoji": "🤝", "costLabel": "₹6,000", "tone": "neutral",
-              "effects": { "cash": -6000 } }
+            {
+              "id": "o1",
+              "emoji": "🤩",
+              "costLabel": "₹1,200 × 24 mah",
+              "tone": "bad",
+              "effects": {
+                "drain": {
+                  "monthly": 1200,
+                  "years": 2
+                },
+                "tension": 5,
+                "flags": {
+                  "phoneEMI": true
+                }
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "🪔",
+              "costLabel": "₹500/mah gullak",
+              "tone": "good",
+              "effects": {
+                "autosave": {
+                  "target": "cash",
+                  "monthly": 500
+                }
+              }
+            },
+            {
+              "id": "o3",
+              "emoji": "🤝",
+              "costLabel": "₹6,000",
+              "tone": "neutral",
+              "effects": {
+                "cash": -6000
+              }
+            }
           ]
         },
-        { "id": "c1s2", "type": "decision", "emoji": "🧕",
-          "learnmore": { "key": "lm.chit", "video": "https://www.youtube.com/results?search_query=chit+fund+fraud+kaise+bache+hindi" },
+        {
+          "id": "c1s2",
+          "type": "decision",
+          "emoji": "🧕",
+          "learnmore": {
+            "key": "lm.chit",
+            "video": "https://www.youtube.com/results?search_query=chit+fund+fraud+kaise+bache+hindi"
+          },
           "options": [
-            { "id": "o1", "emoji": "🤑", "costLabel": "₹1,000/mah", "tone": "neutral",
-              "effects": { "autosave": { "target": "chit", "monthly": 1000 }, "flags": { "chitJoined": true } } },
-            { "id": "o2", "emoji": "🙏", "costLabel": "", "tone": "good", "effects": {} },
-            { "id": "o3", "emoji": "🤔", "costLabel": "", "tone": "good", "effects": { "tension": -2 } }
+            {
+              "id": "o1",
+              "emoji": "🤑",
+              "costLabel": "₹1,000/mah",
+              "tone": "neutral",
+              "effects": {
+                "autosave": {
+                  "target": "chit",
+                  "monthly": 1000
+                },
+                "flags": {
+                  "chitJoined": true
+                }
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "🙏",
+              "costLabel": "",
+              "tone": "good",
+              "effects": {}
+            },
+            {
+              "id": "o3",
+              "emoji": "🤔",
+              "costLabel": "",
+              "tone": "good",
+              "effects": {
+                "tension": -2
+              }
+            }
           ]
         },
-        { "id": "c1s3", "type": "decision", "emoji": "🪪",
-          "learnmore": { "key": "lm.eshram", "video": "https://www.youtube.com/results?search_query=e+shram+card+benefits+hindi" },
+        {
+          "id": "c1s3",
+          "type": "decision",
+          "emoji": "🪪",
+          "learnmore": {
+            "key": "lm.eshram",
+            "video": "https://www.youtube.com/results?search_query=e+shram+card+benefits+hindi"
+          },
           "options": [
-            { "id": "o1", "emoji": "✍️", "costLabel": "Free", "tone": "good", "effects": { "flags": { "eshram": true } } },
-            { "id": "o2", "emoji": "⏰", "costLabel": "", "tone": "neutral", "effects": {} },
-            { "id": "o3", "emoji": "🍛", "costLabel": "₹200", "tone": "neutral", "effects": { "cash": -200, "tension": -3 } }
+            {
+              "id": "o1",
+              "emoji": "✍️",
+              "costLabel": "Free",
+              "tone": "good",
+              "effects": {
+                "flags": {
+                  "eshram": true
+                }
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "⏰",
+              "costLabel": "",
+              "tone": "neutral",
+              "effects": {}
+            },
+            {
+              "id": "o3",
+              "emoji": "🍛",
+              "costLabel": "₹200",
+              "tone": "neutral",
+              "effects": {
+                "cash": -200,
+                "tension": -3
+              }
+            }
           ]
         },
-        { "id": "c1s4", "type": "decision", "emoji": "📞",
+        {
+          "id": "c1s4",
+          "type": "decision",
+          "emoji": "📞",
           "options": [
-            { "id": "o1", "emoji": "💸", "costLabel": "₹5,000", "tone": "neutral", "effects": { "cash": -5000, "tension": -2 } },
-            { "id": "o2", "emoji": "🤝", "costLabel": "₹2,500", "tone": "good", "effects": { "cash": -2500 } },
-            { "id": "o3", "emoji": "🙅‍♀️", "costLabel": "", "tone": "neutral", "effects": { "tension": 8 } }
+            {
+              "id": "o1",
+              "emoji": "💸",
+              "costLabel": "₹5,000",
+              "tone": "neutral",
+              "effects": {
+                "cash": -5000,
+                "tension": -2
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "🤝",
+              "costLabel": "₹2,500",
+              "tone": "good",
+              "effects": {
+                "cash": -2500
+              }
+            },
+            {
+              "id": "o3",
+              "emoji": "🙅‍♀️",
+              "costLabel": "",
+              "tone": "neutral",
+              "effects": {
+                "tension": 8
+              }
+            }
           ]
         }
       ]
     },
-
     {
-      "id": "ch2", "year": 2,
+      "id": "ch2",
+      "year": 2,
       "screens": [
-        { "id": "c2s1", "type": "decision", "emoji": "🏦",
-          "learnmore": { "key": "lm.rd", "video": "https://www.youtube.com/results?search_query=post+office+RD+scheme+hindi" },
+        {
+          "id": "c2s1",
+          "type": "decision",
+          "emoji": "🏦",
+          "learnmore": {
+            "key": "lm.rd",
+            "video": "https://www.youtube.com/results?search_query=post+office+RD+scheme+hindi"
+          },
           "options": [
-            { "id": "o1", "emoji": "🛏️", "costLabel": "0% byaj", "tone": "bad", "effects": {} },
-            { "id": "o2", "emoji": "🏦", "costLabel": "4% byaj", "tone": "neutral", "effects": { "flags": { "cashInBank": true } } },
-            { "id": "o3", "emoji": "📮", "costLabel": "6.7% byaj", "tone": "good",
-              "effects": { "autosave": { "target": "rd", "monthly": 1000 }, "flags": { "cashInBank": true } } }
+            {
+              "id": "o1",
+              "emoji": "🛏️",
+              "costLabel": "0% byaj",
+              "tone": "bad",
+              "effects": {}
+            },
+            {
+              "id": "o2",
+              "emoji": "🏦",
+              "costLabel": "4% byaj",
+              "tone": "neutral",
+              "effects": {
+                "flags": {
+                  "cashInBank": true
+                }
+              }
+            },
+            {
+              "id": "o3",
+              "emoji": "📮",
+              "costLabel": "6.7% byaj",
+              "tone": "good",
+              "effects": {
+                "autosave": {
+                  "target": "rd",
+                  "monthly": 1000
+                },
+                "flags": {
+                  "cashInBank": true
+                }
+              }
+            }
           ]
         },
-        { "id": "c2s2", "type": "decision", "emoji": "🛡️",
-          "learnmore": { "key": "lm.jansuraksha", "video": "https://www.youtube.com/results?search_query=PMJJBY+PMSBY+436+rupees+insurance+hindi" },
+        {
+          "id": "c2s2",
+          "type": "decision",
+          "emoji": "🛡️",
+          "learnmore": {
+            "key": "lm.jansuraksha",
+            "video": "https://www.youtube.com/results?search_query=PMJJBY+PMSBY+436+rupees+insurance+hindi"
+          },
           "options": [
-            { "id": "o1", "emoji": "🛡️", "costLabel": "₹456/saal", "tone": "good",
-              "effects": { "drain": { "monthly": 38, "years": 99 }, "flags": { "pmjjby": true, "pmsby": true } } },
-            { "id": "o2", "emoji": "🪙", "costLabel": "₹20/saal", "tone": "neutral",
-              "effects": { "drain": { "monthly": 2, "years": 99 }, "flags": { "pmsby": true } } },
-            { "id": "o3", "emoji": "😤", "costLabel": "", "tone": "bad", "effects": {} }
+            {
+              "id": "o1",
+              "emoji": "🛡️",
+              "costLabel": "₹456/saal",
+              "tone": "good",
+              "effects": {
+                "drain": {
+                  "monthly": 38,
+                  "years": 99
+                },
+                "flags": {
+                  "pmjjby": true,
+                  "pmsby": true
+                }
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "🪙",
+              "costLabel": "₹20/saal",
+              "tone": "neutral",
+              "effects": {
+                "drain": {
+                  "monthly": 2,
+                  "years": 99
+                },
+                "flags": {
+                  "pmsby": true
+                }
+              }
+            },
+            {
+              "id": "o3",
+              "emoji": "😤",
+              "costLabel": "",
+              "tone": "bad",
+              "effects": {}
+            }
           ]
         },
-        { "id": "c2s3", "type": "decision", "emoji": "🏥",
-          "learnmore": { "key": "lm.pmjay", "video": "https://www.youtube.com/results?search_query=ayushman+card+kaise+banaye+hindi" },
+        {
+          "id": "c2s3",
+          "type": "decision",
+          "emoji": "🏥",
+          "learnmore": {
+            "key": "lm.pmjay",
+            "video": "https://www.youtube.com/results?search_query=ayushman+card+kaise+banaye+hindi"
+          },
           "options": [
-            { "id": "o1", "emoji": "✅", "costLabel": "Free", "tone": "good", "effects": { "flags": { "pmjay": true } } },
-            { "id": "o2", "emoji": "🤷‍♀️", "costLabel": "", "tone": "neutral", "effects": {} }
+            {
+              "id": "o1",
+              "emoji": "✅",
+              "costLabel": "Free",
+              "tone": "good",
+              "effects": {
+                "flags": {
+                  "pmjay": true
+                }
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "🤷‍♀️",
+              "costLabel": "",
+              "tone": "neutral",
+              "effects": {}
+            }
           ]
         },
-        { "id": "c2s4", "type": "decision", "emoji": "🎉",
+        {
+          "id": "c2s4",
+          "type": "decision",
+          "emoji": "🎉",
           "options": [
-            { "id": "o1", "emoji": "📮", "costLabel": "+₹1,000/mah RD", "tone": "good",
-              "effects": { "autosave": { "target": "rd", "monthly": 1000 } } },
-            { "id": "o2", "emoji": "👗", "costLabel": "₹1,000/mah", "tone": "neutral",
-              "effects": { "drain": { "monthly": 1000, "years": 3 }, "tension": -4 } },
-            { "id": "o3", "emoji": "🏡", "costLabel": "₹1,000/mah", "tone": "neutral",
-              "effects": { "drain": { "monthly": 1000, "years": 2 }, "tension": -5 } }
+            {
+              "id": "o1",
+              "emoji": "📮",
+              "costLabel": "+₹1,000/mah RD",
+              "tone": "good",
+              "effects": {
+                "autosave": {
+                  "target": "rd",
+                  "monthly": 1000
+                }
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "👗",
+              "costLabel": "₹1,000/mah",
+              "tone": "neutral",
+              "effects": {
+                "drain": {
+                  "monthly": 1000,
+                  "years": 3
+                },
+                "tension": -4
+              }
+            },
+            {
+              "id": "o3",
+              "emoji": "🏡",
+              "costLabel": "₹1,000/mah",
+              "tone": "neutral",
+              "effects": {
+                "drain": {
+                  "monthly": 1000,
+                  "years": 2
+                },
+                "tension": -5
+              }
+            }
           ]
         }
       ]
     },
-
     {
-      "id": "ch3", "year": 3,
-      "event": { "pool": [ { "id": "ev_dengue", "weight": 1 }, { "id": "ev_flood", "weight": 1 } ] },
+      "id": "ch3",
+      "year": 3,
+      "event": {
+        "pool": [
+          {
+            "id": "ev_dengue",
+            "weight": 1
+          },
+          {
+            "id": "ev_flood",
+            "weight": 1
+          }
+        ]
+      },
       "screens": [
-        { "id": "c3s2", "type": "decision", "emoji": "💭",
-          "learnmore": { "key": "lm.efund", "video": "https://www.youtube.com/results?search_query=emergency+fund+kaise+banaye+hindi" },
+        {
+          "id": "c3s2",
+          "type": "decision",
+          "emoji": "💭",
+          "learnmore": {
+            "key": "lm.efund",
+            "video": "https://www.youtube.com/results?search_query=emergency+fund+kaise+banaye+hindi"
+          },
           "options": [
-            { "id": "o1", "emoji": "🪔", "costLabel": "₹500/mah", "tone": "good",
-              "effects": { "autosave": { "target": "cash", "monthly": 500 } } },
-            { "id": "o2", "emoji": "🛡️", "costLabel": "₹456/saal", "tone": "good", "hideIfFlag": "pmjjby",
-              "effects": { "drain": { "monthly": 38, "years": 99 }, "flags": { "pmjjby": true, "pmsby": true } } },
-            { "id": "o3", "emoji": "🥲", "costLabel": "", "tone": "neutral", "effects": {} }
+            {
+              "id": "o1",
+              "emoji": "🪔",
+              "costLabel": "₹500/mah",
+              "tone": "good",
+              "effects": {
+                "autosave": {
+                  "target": "cash",
+                  "monthly": 500
+                }
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "🛡️",
+              "costLabel": "₹456/saal",
+              "tone": "good",
+              "hideIfFlag": "pmjjby",
+              "effects": {
+                "drain": {
+                  "monthly": 38,
+                  "years": 99
+                },
+                "flags": {
+                  "pmjjby": true,
+                  "pmsby": true
+                }
+              }
+            },
+            {
+              "id": "o3",
+              "emoji": "🥲",
+              "costLabel": "",
+              "tone": "neutral",
+              "effects": {}
+            }
           ]
         }
       ]
     },
-
     {
-      "id": "ch4", "year": 5, "album": true,
+      "id": "ch4",
+      "year": 5,
+      "album": true,
       "screens": [
-        { "id": "c4s1", "type": "decision", "emoji": "💍",
-          "learnmore": { "key": "lm.gold", "video": "https://www.youtube.com/results?search_query=jeweller+gold+scheme+sach+hindi" },
+        {
+          "id": "c4s1",
+          "type": "decision",
+          "emoji": "💍",
+          "learnmore": {
+            "key": "lm.gold",
+            "video": "https://www.youtube.com/results?search_query=jeweller+gold+scheme+sach+hindi"
+          },
           "options": [
-            { "id": "o1", "emoji": "✨", "costLabel": "₹1,000/mah", "tone": "neutral",
-              "effects": { "autosave": { "target": "gold", "monthly": 1000 }, "flags": { "goldScheme": true } } },
-            { "id": "o2", "emoji": "🪙", "costLabel": "₹8,000", "tone": "neutral",
-              "effects": { "invest": { "target": "gold", "amount": 8000 } } },
-            { "id": "o3", "emoji": "🧧", "costLabel": "₹2,001", "tone": "good", "effects": { "cash": -2001 } }
+            {
+              "id": "o1",
+              "emoji": "✨",
+              "costLabel": "₹1,000/mah",
+              "tone": "neutral",
+              "effects": {
+                "autosave": {
+                  "target": "gold",
+                  "monthly": 1000
+                },
+                "flags": {
+                  "goldScheme": true
+                }
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "🪙",
+              "costLabel": "₹8,000",
+              "tone": "neutral",
+              "effects": {
+                "invest": {
+                  "target": "gold",
+                  "amount": 8000
+                }
+              }
+            },
+            {
+              "id": "o3",
+              "emoji": "🧧",
+              "costLabel": "₹2,001",
+              "tone": "good",
+              "effects": {
+                "cash": -2001
+              }
+            }
           ]
         },
-        { "id": "c4s2", "type": "decision", "emoji": "🏮",
+        {
+          "id": "c4s2",
+          "type": "decision",
+          "emoji": "🏮",
           "options": [
-            { "id": "o1", "emoji": "😰", "costLabel": "₹30,000 karz", "tone": "bad",
-              "effects": { "debt": 30000, "tension": -3 } },
-            { "id": "o2", "emoji": "🎁", "costLabel": "₹5,000", "tone": "good",
-              "effects": { "cash": -5000, "tension": 5 } },
-            { "id": "o3", "emoji": "🗣️", "costLabel": "₹10,000", "tone": "neutral",
-              "effects": { "cash": -10000, "tension": 1 } }
+            {
+              "id": "o1",
+              "emoji": "😰",
+              "costLabel": "₹30,000 karz",
+              "tone": "bad",
+              "effects": {
+                "debt": 30000,
+                "tension": -3
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "🎁",
+              "costLabel": "₹5,000",
+              "tone": "good",
+              "effects": {
+                "cash": -5000,
+                "tension": 5
+              }
+            },
+            {
+              "id": "o3",
+              "emoji": "🗣️",
+              "costLabel": "₹10,000",
+              "tone": "neutral",
+              "effects": {
+                "cash": -10000,
+                "tension": 1
+              }
+            }
           ]
         },
-        { "id": "c4s3", "type": "decision", "emoji": "🏍️",
+        {
+          "id": "c4s3",
+          "type": "decision",
+          "emoji": "🏍️",
           "options": [
-            { "id": "o1", "emoji": "🆕", "costLabel": "₹60,000 karz", "tone": "bad",
-              "effects": { "debt": 60000, "tension": -2 } },
-            { "id": "o2", "emoji": "🔧", "costLabel": "₹25,000", "tone": "neutral",
-              "effects": { "cash": -25000 } },
-            { "id": "o3", "emoji": "⏳", "costLabel": "", "tone": "good",
-              "effects": { "tension": 4, "flags": { "bikeWait": true } } }
+            {
+              "id": "o1",
+              "emoji": "🆕",
+              "costLabel": "₹60,000 karz",
+              "tone": "bad",
+              "effects": {
+                "debt": 60000,
+                "tension": -2
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "🔧",
+              "costLabel": "₹25,000",
+              "tone": "neutral",
+              "effects": {
+                "cash": -25000
+              }
+            },
+            {
+              "id": "o3",
+              "emoji": "⏳",
+              "costLabel": "",
+              "tone": "good",
+              "effects": {
+                "tension": 4,
+                "flags": {
+                  "bikeWait": true
+                }
+              }
+            }
           ]
         }
       ]
     },
-
     {
-      "id": "ch5", "year": 7,
+      "id": "ch5",
+      "year": 7,
       "screens": [
-        { "id": "c5s1", "type": "decision", "emoji": "👶",
-          "learnmore": { "key": "lm.ssy", "video": "https://www.youtube.com/results?search_query=sukanya+samriddhi+yojana+2026+hindi" },
+        {
+          "id": "c5s1",
+          "type": "decision",
+          "emoji": "👶",
+          "learnmore": {
+            "key": "lm.ssy",
+            "video": "https://www.youtube.com/results?search_query=sukanya+samriddhi+yojana+2026+hindi"
+          },
           "options": [
-            { "id": "o1", "emoji": "🌸", "costLabel": "₹500/mah, 8.2%", "tone": "good",
-              "effects": { "autosave": { "target": "ssy", "monthly": 500 }, "flags": { "ssy": true } } },
-            { "id": "o2", "emoji": "😴", "costLabel": "", "tone": "neutral", "effects": {} },
-            { "id": "o3", "emoji": "🤵", "costLabel": "₹1,000/mah", "tone": "bad",
-              "effects": { "autosave": { "target": "endowment", "monthly": 1000 }, "flags": { "endowment": true } } }
+            {
+              "id": "o1",
+              "emoji": "🌸",
+              "costLabel": "₹500/mah, 8.2%",
+              "tone": "good",
+              "effects": {
+                "autosave": {
+                  "target": "ssy",
+                  "monthly": 500
+                },
+                "flags": {
+                  "ssy": true
+                }
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "😴",
+              "costLabel": "",
+              "tone": "neutral",
+              "effects": {}
+            },
+            {
+              "id": "o3",
+              "emoji": "🤵",
+              "costLabel": "₹1,000/mah",
+              "tone": "bad",
+              "effects": {
+                "autosave": {
+                  "target": "endowment",
+                  "monthly": 1000
+                },
+                "flags": {
+                  "endowment": true
+                }
+              }
+            }
           ]
         },
-        { "id": "c5s2", "type": "decision", "emoji": "🍼",
+        {
+          "id": "c5s2",
+          "type": "decision",
+          "emoji": "🍼",
           "options": [
-            { "id": "o1", "emoji": "⏸️", "costLabel": "", "tone": "good", "effects": { "pauseSaves": 1 } },
-            { "id": "o2", "emoji": "💔", "costLabel": "-5% byaj", "tone": "neutral", "effects": { "redeem": { "target": "rd", "cut": 0.05 } } },
-            { "id": "o3", "emoji": "🙏", "costLabel": "₹15,000 karz", "tone": "bad", "effects": { "debt": 15000 } }
+            {
+              "id": "o1",
+              "emoji": "⏸️",
+              "costLabel": "",
+              "tone": "good",
+              "effects": {
+                "pauseSaves": 1
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "💔",
+              "costLabel": "-5% byaj",
+              "tone": "neutral",
+              "effects": {
+                "redeem": {
+                  "target": "rd",
+                  "cut": 0.05
+                }
+              }
+            },
+            {
+              "id": "o3",
+              "emoji": "🙏",
+              "costLabel": "₹15,000 karz",
+              "tone": "bad",
+              "effects": {
+                "debt": 15000
+              }
+            }
           ]
         },
-        { "id": "c5s3", "type": "decision", "emoji": "👵",
+        {
+          "id": "c5s3",
+          "type": "decision",
+          "emoji": "👵",
           "options": [
-            { "id": "o1", "emoji": "🪙", "costLabel": "₹5,000", "tone": "neutral", "effects": { "invest": { "target": "gold", "amount": 5000 } } },
-            { "id": "o2", "emoji": "🌸", "costLabel": "₹5,000", "tone": "good", "effects": { "invest": { "target": "ssy", "amount": 5000 } } },
-            { "id": "o3", "emoji": "⚖️", "costLabel": "₹2,500 + ₹2,500", "tone": "good",
-              "effects": { "invest": { "target": "gold", "amount": 2500 }, "invest2": { "target": "ssy", "amount": 2500 } } }
+            {
+              "id": "o1",
+              "emoji": "🪙",
+              "costLabel": "₹5,000",
+              "tone": "neutral",
+              "effects": {
+                "invest": {
+                  "target": "gold",
+                  "amount": 5000
+                }
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "🌸",
+              "costLabel": "₹5,000",
+              "tone": "good",
+              "effects": {
+                "invest": {
+                  "target": "ssy",
+                  "amount": 5000
+                }
+              }
+            },
+            {
+              "id": "o3",
+              "emoji": "⚖️",
+              "costLabel": "₹2,500 + ₹2,500",
+              "tone": "good",
+              "effects": {
+                "invest": {
+                  "target": "gold",
+                  "amount": 2500
+                },
+                "invest2": {
+                  "target": "ssy",
+                  "amount": 2500
+                }
+              }
+            }
           ]
         }
       ]
     },
-
     {
-      "id": "ch6", "year": 10, "album": true,
+      "id": "ch6",
+      "year": 10,
+      "album": true,
       "screens": [
-        { "id": "c6s1", "type": "decision", "emoji": "🎩",
-          "learnmore": { "key": "lm.scam", "video": "https://www.youtube.com/results?search_query=ponzi+scheme+paisa+double+fraud+hindi" },
+        {
+          "id": "c6s1",
+          "type": "decision",
+          "emoji": "🎩",
+          "learnmore": {
+            "key": "lm.scam",
+            "video": "https://www.youtube.com/results?search_query=ponzi+scheme+paisa+double+fraud+hindi"
+          },
           "options": [
-            { "id": "o1", "emoji": "🤑", "costLabel": "₹50,000", "tone": "neutral",
-              "effects": { "invest": { "target": "scam", "amount": 50000 }, "flags": { "scamAll": true } } },
-            { "id": "o2", "emoji": "🧪", "costLabel": "₹10,000", "tone": "neutral",
-              "effects": { "invest": { "target": "scam", "amount": 10000 } } },
-            { "id": "o3", "emoji": "🚫", "costLabel": "", "tone": "good", "effects": { "tension": 2 } }
+            {
+              "id": "o1",
+              "emoji": "🤑",
+              "costLabel": "₹50,000",
+              "tone": "neutral",
+              "effects": {
+                "invest": {
+                  "target": "scam",
+                  "amount": 50000
+                },
+                "flags": {
+                  "scamAll": true
+                }
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "🧪",
+              "costLabel": "₹10,000",
+              "tone": "neutral",
+              "effects": {
+                "invest": {
+                  "target": "scam",
+                  "amount": 10000
+                }
+              }
+            },
+            {
+              "id": "o3",
+              "emoji": "🚫",
+              "costLabel": "",
+              "tone": "good",
+              "effects": {
+                "tension": 2
+              }
+            }
           ]
         },
-        { "id": "c6s2", "type": "decision", "emoji": "📈",
-          "learnmore": { "key": "lm.sip", "video": "https://www.youtube.com/watch?v=e6Ny74qZN4A" },
+        {
+          "id": "c6s2",
+          "type": "decision",
+          "emoji": "📈",
+          "learnmore": {
+            "key": "lm.sip",
+            "video": "https://www.youtube.com/watch?v=e6Ny74qZN4A"
+          },
           "options": [
-            { "id": "o1", "emoji": "🌱", "costLabel": "₹500/mah", "tone": "good",
-              "effects": { "autosave": { "target": "sip", "monthly": 500 }, "flags": { "sip": true } } },
-            { "id": "o2", "emoji": "🎲", "costLabel": "", "tone": "neutral", "effects": {} },
-            { "id": "o3", "emoji": "🌳", "costLabel": "₹1,000/mah", "tone": "good",
-              "effects": { "autosave": { "target": "sip", "monthly": 1000 }, "flags": { "sip": true } } }
+            {
+              "id": "o1",
+              "emoji": "🌱",
+              "costLabel": "₹500/mah",
+              "tone": "good",
+              "effects": {
+                "autosave": {
+                  "target": "sip",
+                  "monthly": 500
+                },
+                "flags": {
+                  "sip": true
+                }
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "🎲",
+              "costLabel": "",
+              "tone": "neutral",
+              "effects": {}
+            },
+            {
+              "id": "o3",
+              "emoji": "🌳",
+              "costLabel": "₹1,000/mah",
+              "tone": "good",
+              "effects": {
+                "autosave": {
+                  "target": "sip",
+                  "monthly": 1000
+                },
+                "flags": {
+                  "sip": true
+                }
+              }
+            }
           ]
         },
-        { "id": "c6s3", "type": "decision", "emoji": "🎰",
+        {
+          "id": "c6s3",
+          "type": "decision",
+          "emoji": "🎰",
           "options": [
-            { "id": "o1", "emoji": "🎮", "costLabel": "₹100/din", "tone": "bad",
-              "effects": { "drain": { "monthly": 3000, "years": 2 }, "tension": 5 } },
-            { "id": "o2", "emoji": "📵", "costLabel": "", "tone": "good", "effects": {} },
-            { "id": "o3", "emoji": "🗣️", "costLabel": "", "tone": "good", "effects": { "tension": -2 } }
+            {
+              "id": "o1",
+              "emoji": "🎮",
+              "costLabel": "₹100/din",
+              "tone": "bad",
+              "effects": {
+                "drain": {
+                  "monthly": 3000,
+                  "years": 2
+                },
+                "tension": 5
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "📵",
+              "costLabel": "",
+              "tone": "good",
+              "effects": {}
+            },
+            {
+              "id": "o3",
+              "emoji": "🗣️",
+              "costLabel": "",
+              "tone": "good",
+              "effects": {
+                "tension": -2
+              }
+            }
           ]
         },
-        { "id": "c6s4", "type": "decision", "emoji": "👵",
-          "learnmore": { "key": "lm.apy", "video": "https://www.youtube.com/results?search_query=atal+pension+yojana+2026+hindi" },
+        {
+          "id": "c6s4",
+          "type": "decision",
+          "emoji": "👵",
+          "learnmore": {
+            "key": "lm.apy",
+            "video": "https://www.youtube.com/results?search_query=atal+pension+yojana+2026+hindi"
+          },
           "options": [
-            { "id": "o1", "emoji": "🌅", "costLabel": "₹210/mah", "tone": "good",
-              "effects": { "drain": { "monthly": 210, "years": 99 }, "flags": { "apy": true } } },
-            { "id": "o2", "emoji": "🤷‍♀️", "costLabel": "", "tone": "neutral", "effects": {} },
-            { "id": "o3", "emoji": "🌄", "costLabel": "₹100/mah", "tone": "good",
-              "effects": { "drain": { "monthly": 100, "years": 99 }, "flags": { "apy": true } } }
+            {
+              "id": "o1",
+              "emoji": "🌅",
+              "costLabel": "₹210/mah",
+              "tone": "good",
+              "effects": {
+                "drain": {
+                  "monthly": 210,
+                  "years": 99
+                },
+                "flags": {
+                  "apy": true
+                }
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "🤷‍♀️",
+              "costLabel": "",
+              "tone": "neutral",
+              "effects": {}
+            },
+            {
+              "id": "o3",
+              "emoji": "🌄",
+              "costLabel": "₹100/mah",
+              "tone": "good",
+              "effects": {
+                "drain": {
+                  "monthly": 100,
+                  "years": 99
+                },
+                "flags": {
+                  "apy": true
+                }
+              }
+            }
           ]
         }
       ]
     },
-
     {
-      "id": "ch7", "year": 15, "album": true,
-      "event": { "pool": [
-        { "id": "ev_accident", "weight": 4 },
-        { "id": "ev_joblose",  "weight": 4 },
-        { "id": "ev_death",    "weight": 1 }
-      ] },
+      "id": "ch7",
+      "year": 15,
+      "album": true,
+      "event": {
+        "pool": [
+          {
+            "id": "ev_accident",
+            "weight": 4
+          },
+          {
+            "id": "ev_joblose",
+            "weight": 4
+          },
+          {
+            "id": "ev_death",
+            "weight": 1
+          }
+        ]
+      },
       "screens": [
-        { "id": "c7s2", "type": "decision", "emoji": "🎒",
+        {
+          "id": "c7s2",
+          "type": "decision",
+          "emoji": "🎒",
           "options": [
-            { "id": "o1", "emoji": "📚", "costLabel": "₹15,000", "tone": "good",
-              "effects": { "cash": -15000, "flags": { "eduKept": true } } },
-            { "id": "o2", "emoji": "😞", "costLabel": "", "tone": "bad",
-              "effects": { "tension": 10, "flags": { "eduPulled": true } } },
-            { "id": "o3", "emoji": "🔍", "costLabel": "₹5,000", "tone": "good", "needFlag": "eshram",
-              "effects": { "cash": -5000, "flags": { "eduKept": true } } }
+            {
+              "id": "o1",
+              "emoji": "📚",
+              "costLabel": "₹15,000",
+              "tone": "good",
+              "effects": {
+                "cash": -15000,
+                "flags": {
+                  "eduKept": true
+                }
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "😞",
+              "costLabel": "",
+              "tone": "bad",
+              "effects": {
+                "tension": 10,
+                "flags": {
+                  "eduPulled": true
+                }
+              }
+            },
+            {
+              "id": "o3",
+              "emoji": "🔍",
+              "costLabel": "₹5,000",
+              "tone": "good",
+              "needFlag": "eshram",
+              "effects": {
+                "cash": -5000,
+                "flags": {
+                  "eduKept": true
+                }
+              }
+            }
           ]
         }
       ]
     },
-
     {
-      "id": "ch8", "year": 20,
+      "id": "ch8",
+      "year": 20,
       "screens": [
-        { "id": "c8s1", "type": "decision", "emoji": "🌾",
+        {
+          "id": "c8s1",
+          "type": "decision",
+          "emoji": "🌾",
           "options": [
-            { "id": "o1", "emoji": "💰", "costLabel": "+₹1,50,000", "tone": "neutral",
-              "effects": { "cash": 150000, "flags": { "landSold": true } } },
-            { "id": "o2", "emoji": "🌱", "costLabel": "+₹2,000/mah", "tone": "good",
-              "effects": { "drain": { "monthly": -2000, "years": 99 }, "flags": { "landLease": true } } },
-            { "id": "o3", "emoji": "🪨", "costLabel": "", "tone": "neutral", "effects": {} }
+            {
+              "id": "o1",
+              "emoji": "💰",
+              "costLabel": "+₹1,50,000",
+              "tone": "neutral",
+              "effects": {
+                "cash": 150000,
+                "flags": {
+                  "landSold": true
+                }
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "🌱",
+              "costLabel": "+₹2,000/mah",
+              "tone": "good",
+              "effects": {
+                "drain": {
+                  "monthly": -2000,
+                  "years": 99
+                },
+                "flags": {
+                  "landLease": true
+                }
+              }
+            },
+            {
+              "id": "o3",
+              "emoji": "🪨",
+              "costLabel": "",
+              "tone": "neutral",
+              "effects": {}
+            }
           ]
         },
-        { "id": "c8s2", "type": "decision", "emoji": "🌸",
+        {
+          "id": "c8s2",
+          "type": "decision",
+          "emoji": "🌸",
           "options": [
-            { "id": "o1", "emoji": "🚀", "costLabel": "₹10,000", "tone": "good", "needFlag": "ssy",
-              "effects": { "invest": { "target": "ssy", "amount": 10000 } } },
-            { "id": "o2", "emoji": "👍", "costLabel": "", "tone": "neutral", "effects": {} },
-            { "id": "o3", "emoji": "📮", "costLabel": "₹1,000/mah RD", "tone": "good", "hideIfFlag": "ssy",
-              "effects": { "autosave": { "target": "rd", "monthly": 1000 } } }
+            {
+              "id": "o1",
+              "emoji": "🚀",
+              "costLabel": "₹10,000",
+              "tone": "good",
+              "needFlag": "ssy",
+              "effects": {
+                "invest": {
+                  "target": "ssy",
+                  "amount": 10000
+                }
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "👍",
+              "costLabel": "",
+              "tone": "neutral",
+              "effects": {}
+            },
+            {
+              "id": "o3",
+              "emoji": "📮",
+              "costLabel": "₹1,000/mah RD",
+              "tone": "good",
+              "hideIfFlag": "ssy",
+              "effects": {
+                "autosave": {
+                  "target": "rd",
+                  "monthly": 1000
+                }
+              }
+            }
+          ],
+          "hideIfFlag": "eduPulled"
+        },
+        {
+          "id": "c8s2p",
+          "type": "decision",
+          "emoji": "📖",
+          "showIfFlag": "eduPulled",
+          "options": [
+            {
+              "id": "o1",
+              "emoji": "🌟",
+              "costLabel": "₹3,000",
+              "tone": "good",
+              "effects": {
+                "cash": -3000,
+                "tension": -6,
+                "flags": {
+                  "eduReenrolled": true
+                }
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "🧵",
+              "costLabel": "₹2,000",
+              "tone": "good",
+              "effects": {
+                "cash": -2000,
+                "tension": -3,
+                "flags": {
+                  "eduSkill": true
+                }
+              }
+            },
+            {
+              "id": "o3",
+              "emoji": "🤷‍♀️",
+              "costLabel": "",
+              "tone": "neutral",
+              "effects": {
+                "tension": 4
+              }
+            }
           ]
         },
-        { "id": "c8s3", "type": "decision", "emoji": "🏘️",
+        {
+          "id": "c8s3",
+          "type": "decision",
+          "emoji": "🏘️",
           "options": [
-            { "id": "o1", "emoji": "👩‍🏫", "costLabel": "", "tone": "good",
-              "effects": { "tension": -5, "flags": { "mentor": true } } },
-            { "id": "o2", "emoji": "🤫", "costLabel": "", "tone": "neutral", "effects": {} }
+            {
+              "id": "o1",
+              "emoji": "👩‍🏫",
+              "costLabel": "",
+              "tone": "good",
+              "effects": {
+                "tension": -5,
+                "flags": {
+                  "mentor": true
+                }
+              }
+            },
+            {
+              "id": "o2",
+              "emoji": "🤫",
+              "costLabel": "",
+              "tone": "neutral",
+              "effects": {}
+            }
           ]
         }
       ]
     }
   ],
-
   "events": {
-    "ev_dengue":   { "emoji": "🦟", "cost": 35000, "freeIf": ["pmjay"], "tension": 20, "health": -10 },
-    "ev_flood":    { "emoji": "🌧️", "cost": 25000, "freeIf": [],        "tension": 18, "health": -5 },
-    "ev_accident": { "emoji": "🏍️", "cost": 90000, "freeIf": ["pmjay"], "payoutIf": { "pmsby": 100000 }, "incomeLossMonths": 3, "tension": 25, "health": -12 },
-    "ev_joblose":  { "emoji": "🏭", "cost": 0, "freeIf": [], "incomeLossMonths": 4, "tension": 22, "health": -5 },
-    "ev_death":    { "emoji": "🕯️", "cost": 30000, "freeIf": [], "payoutIf": { "pmjjby": 200000 }, "incomeDropShare": 0.4, "tension": 35, "health": -10 }
+    "ev_dengue": {
+      "emoji": "🦟",
+      "cost": 35000,
+      "freeIf": [
+        "pmjay"
+      ],
+      "tension": 20,
+      "health": -10
+    },
+    "ev_flood": {
+      "emoji": "🌧️",
+      "cost": 25000,
+      "freeIf": [],
+      "tension": 18,
+      "health": -5
+    },
+    "ev_accident": {
+      "emoji": "🏍️",
+      "cost": 90000,
+      "freeIf": [
+        "pmjay"
+      ],
+      "payoutIf": {
+        "pmsby": 100000
+      },
+      "incomeLossMonths": 3,
+      "tension": 25,
+      "health": -12
+    },
+    "ev_joblose": {
+      "emoji": "🏭",
+      "cost": 0,
+      "freeIf": [],
+      "incomeLossMonths": 4,
+      "tension": 22,
+      "health": -5
+    },
+    "ev_death": {
+      "emoji": "🕯️",
+      "cost": 30000,
+      "freeIf": [],
+      "payoutIf": {
+        "pmjjby": 200000
+      },
+      "incomeDropShare": 0.4,
+      "tension": 35,
+      "health": -10
+    }
   }
 }
