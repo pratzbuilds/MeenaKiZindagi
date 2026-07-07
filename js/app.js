@@ -1,0 +1,634 @@
+/* ============================================================
+   MEENA KI ZINDAGI — game engine
+   Plain JavaScript. No build step. No framework.
+   Story logic lives in data/story.json
+   All words live in data/lang/{en,hi,mr}.json
+   ============================================================ */
+(function () {
+  "use strict";
+
+  const SAVE_KEY = "meena_save_v2";
+  const LANG_KEY = "meena_lang";
+  const MUTE_KEY = "meena_mute";
+
+  let STORY = null;        // story.json
+  let L = {};              // current language strings
+  let S = null;            // game state
+  const app = document.getElementById("app");
+
+  /* ---------------- i18n ---------------- */
+  function t(key, vars) {
+    let s = L[key];
+    if (s === undefined) s = key; // fail visible, not silent
+    if (vars) for (const k in vars) s = s.split("{" + k + "}").join(vars[k]);
+    return s;
+  }
+  function rupees(n) {
+    n = Math.round(n);
+    const neg = n < 0; n = Math.abs(n);
+    return (neg ? "-₹" : "₹") + n.toLocaleString("en-IN");
+  }
+
+  /* ---------------- sound (synthesized, no files) ---------------- */
+  let audioCtx = null;
+  function muted() { return localStorage.getItem(MUTE_KEY) === "1"; }
+  function tone(freq, dur, type, delay, vol) {
+    if (muted()) return;
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = type || "triangle"; o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, audioCtx.currentTime + delay);
+      g.gain.exponentialRampToValueAtTime(vol || 0.18, audioCtx.currentTime + delay + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + delay + dur);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(audioCtx.currentTime + delay); o.stop(audioCtx.currentTime + delay + dur + 0.05);
+    } catch (e) { /* audio unavailable — fine */ }
+  }
+  const sfx = {
+    click: () => tone(600, 0.08, "square", 0, 0.06),
+    coin:  () => { tone(880, 0.09, "triangle", 0); tone(1320, 0.12, "triangle", 0.08); },
+    good:  () => { tone(523, 0.1, "triangle", 0); tone(659, 0.1, "triangle", 0.09); tone(784, 0.16, "triangle", 0.18); },
+    bad:   () => { tone(330, 0.15, "sawtooth", 0, 0.08); tone(220, 0.25, "sawtooth", 0.13, 0.08); },
+    sting: () => { tone(196, 0.3, "sawtooth", 0, 0.1); tone(185, 0.35, "sawtooth", 0.25, 0.1); },
+    win:   () => { [523,659,784,1046].forEach((f,i)=>tone(f,0.18,"triangle",i*0.12,0.14)); }
+  };
+
+  /* ---------------- state ---------------- */
+  function newState(charId, incomeIdx) {
+    const inc = STORY.incomes[incomeIdx];
+    return {
+      lang: localStorage.getItem(LANG_KEY) || "en",
+      charId, incomeIdx,
+      personal: inc.personal, household: inc.household,
+      year: 1, chapterIdx: 0, screenIdx: -1, phase: "chapterIntro",
+      pots: { cash: 0, rd: 0, sip: 0, ssy: 0, gold: 0, chit: 0, endowment: 0, scam: 0 },
+      autos: {}, drains: [], debt: 0,
+      tension: 20, health: 90, tensionSum: 0, tensionN: 0,
+      flags: {}, news: [], pauseYears: 0,
+      pendingShortfall: 0, chitDone: false, scamSeen: false,
+      lastFeedback: null, learnOpen: false
+    };
+  }
+  function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) {} }
+  function loadSave() {
+    try { const d = JSON.parse(localStorage.getItem(SAVE_KEY)); return d && d.charId ? d : null; }
+    catch (e) { return null; }
+  }
+
+  function totalAssets() {
+    const p = S.pots;
+    return p.cash + p.rd + p.sip + p.ssy + p.gold + p.chit + p.endowment + p.scam;
+  }
+  function monthlyExpense() { return Math.round(S.household * STORY.config.expenseShare); }
+  function surakshaScore() {
+    let s = 0;
+    if (S.flags.pmjjby) s += 20; if (S.flags.pmsby) s += 15;
+    if (S.flags.pmjay) s += 25; if (S.flags.apy) s += 15;
+    if (S.flags.eshram) s += 10;
+    if (S.pots.cash >= 3 * monthlyExpense()) s += 15;
+    return Math.min(100, s);
+  }
+  function clampMeters() {
+    S.tension = Math.max(0, Math.min(100, S.tension));
+    S.health = Math.max(5, Math.min(100, S.health));
+  }
+
+  /* ---------------- effects ---------------- */
+  function applyEffects(fx) {
+    if (!fx) return;
+    if (fx.cash) S.pots.cash += fx.cash;
+    if (fx.debt) S.debt += fx.debt;
+    if (fx.tension) S.tension += fx.tension;
+    if (fx.health) S.health += fx.health;
+    if (fx.flags) for (const k in fx.flags) S.flags[k] = fx.flags[k];
+    if (fx.autosave) S.autos[fx.autosave.target] = (S.autos[fx.autosave.target] || 0) + fx.autosave.monthly;
+    if (fx.drain) S.drains.push({ monthly: fx.drain.monthly, years: fx.drain.years });
+    if (fx.invest) { S.pots.cash -= fx.invest.amount; S.pots[fx.invest.target] += fx.invest.amount; }
+    if (fx.invest2) { S.pots.cash -= fx.invest2.amount; S.pots[fx.invest2.target] += fx.invest2.amount; }
+    if (fx.pauseSaves) S.pauseYears = Math.max(S.pauseYears, fx.pauseSaves);
+    if (fx.redeem) {
+      const tgt = fx.redeem.target;
+      S.pots.cash += Math.round(S.pots[tgt] * (1 - (fx.redeem.cut || 0)));
+      S.pots[tgt] = 0; delete S.autos[tgt];
+    }
+    clampMeters();
+  }
+
+  /* ---------------- year advance ---------------- */
+  function advanceYears(n) {
+    const R = STORY.config.rates;
+    for (let i = 0; i < n; i++) {
+      S.year++;
+      // autosaves
+      if (S.pauseYears > 0) { S.pauseYears--; }
+      else {
+        for (const tgt in S.autos) S.pots[tgt] += S.autos[tgt] * 12;
+      }
+      // drains (positive = expense, negative = income)
+      S.drains.forEach(d => { if (d.years > 0) { S.pots.cash -= d.monthly * 12; d.years--; } });
+      S.drains = S.drains.filter(d => d.years > 0);
+      // growth
+      for (const tgt in S.pots) {
+        let r = R[tgt] || 0;
+        if (tgt === "cash" && S.flags.cashInBank) r = R.cashInBank;
+        if (tgt === "sip") r = R.sip + (Math.random() * 2 - 1) * STORY.config.sipSwing;
+        S.pots[tgt] = Math.round(S.pots[tgt] * (1 + r));
+      }
+      // negative cash becomes debt
+      if (S.pots.cash < 0) { S.debt += -S.pots.cash; S.pots.cash = 0; }
+      // debt: family tightens the belt and repays BEFORE interest bites
+      if (S.debt > 0) {
+        const effort = Math.round(S.household * 12 * 0.06); // ~6% of yearly income goes to repayment
+        S.debt -= Math.min(S.debt, effort);
+        const spare = Math.max(0, S.pots.cash - monthlyExpense());
+        const extra = Math.min(S.debt, spare);
+        S.debt -= extra; S.pots.cash -= extra;
+        if (S.debt > 0) { S.debt = Math.round(S.debt * (1 + STORY.config.debtRate)); S.tension += 6; }
+      }
+      // chit fate
+      if (S.flags.chitJoined && !S.chitDone) {
+        if (S.year >= STORY.config.chitCollapseYear && Math.random() < STORY.config.chitCollapseChance) {
+          S.pots.chit = 0; delete S.autos.chit; S.chitDone = true;
+          S.tension += 12; S.news.push("chitCollapse");
+        } else if (S.year >= 6) {
+          S.pots.cash += Math.round(S.pots.chit * 1.05);
+          S.pots.chit = 0; delete S.autos.chit; S.chitDone = true;
+          S.news.push("chitPaid");
+        }
+      }
+      // scam fate (resolves after year 10)
+      if (S.scamSeen && S.year > 10 && !S.flags.scamResolved) {
+        S.flags.scamResolved = true;
+        if (S.pots.scam > 0) { S.pots.scam = 0; S.tension += 15; S.news.push("scamGone"); }
+        else S.news.push("scamDodged");
+      }
+      // gentle drift
+      S.tension = Math.max(0, S.tension - 4);
+      S.health = Math.min(100, S.health + 1);
+      S.tensionSum += S.tension; S.tensionN++;
+      clampMeters();
+    }
+  }
+
+  /* ---------------- events (shocks) ---------------- */
+  function pickEvent(pool) {
+    const total = pool.reduce((a, p) => a + p.weight, 0);
+    let r = Math.random() * total;
+    for (const p of pool) { r -= p.weight; if (r <= 0) return p.id; }
+    return pool[0].id;
+  }
+  function resolveEvent(evId) {
+    const ev = STORY.events[evId];
+    const out = { id: evId, lines: [] };
+    S.tension += ev.tension || 0; S.health += ev.health || 0;
+    let cost = ev.cost || 0;
+    // free via scheme (e.g., Ayushman)
+    const freed = (ev.freeIf || []).some(f => S.flags[f]);
+    if (freed && cost > 0) { out.lines.push(t("ev.free")); cost = 0; }
+    // insurance payout
+    let payout = 0;
+    if (ev.payoutIf) for (const f in ev.payoutIf) if (S.flags[f]) payout += ev.payoutIf[f];
+    if (evId === "ev_death") {
+      out.lines.push(S.flags.pmjjby ? t("ev.death.pmjjby") : t("ev.death.nopolicy"));
+      S.flags.widowed = true;
+      if (ev.incomeDropShare) S.household = Math.round(S.household * (1 - ev.incomeDropShare));
+    } else if (payout > 0) {
+      out.lines.push(t("ev.payout", { amt: payout.toLocaleString("en-IN") }));
+    }
+    S.pots.cash += payout;
+    // income loss
+    if (ev.incomeLossMonths) cost += ev.incomeLossMonths * Math.round(S.household * 0.35);
+    // pay
+    if (cost > 0) {
+      if (S.pots.cash >= cost) {
+        S.pots.cash -= cost;
+        out.lines.push(t("ev.paidCash", { amt: cost.toLocaleString("en-IN") }));
+      } else {
+        const short = cost - S.pots.cash;
+        S.pots.cash = 0; S.pendingShortfall = short;
+        out.lines.push(t("ev.shortfall", { amt: short.toLocaleString("en-IN") }));
+      }
+    }
+    clampMeters();
+    return out;
+  }
+
+  /* ---------------- ending ---------------- */
+  function computeEnding() {
+    const assets = totalAssets();
+    const avgT = S.tensionN ? S.tensionSum / S.tensionN : S.tension;
+    let tier;
+    if (S.debt > 25000) tier = 1;
+    else if (assets >= 24 * monthlyExpense() && (S.flags.pmjjby || S.flags.pmsby) && S.flags.apy && S.debt === 0) tier = 4;
+    else if (assets >= 10 * monthlyExpense() && (S.flags.pmjjby || S.flags.pmsby || S.flags.pmjay)) tier = 3;
+    else tier = 2;
+    const ail = avgT > 45 ? "high" : avgT > 25 ? "mid" : "low";
+    const lessons = [];
+    if (tier <= 2) lessons.push("lesson.efund");
+    if (!S.flags.pmjjby) lessons.push("lesson.ins456");
+    if (!S.flags.pmjay) lessons.push("lesson.pmjay");
+    if (!S.flags.ssy) lessons.push("lesson.ssy");
+    if (!S.flags.sip) lessons.push("lesson.sip");
+    if (S.flags.scamResolved && S.news.indexOf("scamDodged") < 0) lessons.push("lesson.scam");
+    if (S.debt > 0) lessons.push("lesson.debt");
+    if (!S.flags.apy) lessons.push("lesson.apy");
+    if (lessons.length === 0) lessons.push("lesson.sip", "lesson.ins456");
+    return { tier, ail, lessons: lessons.slice(0, 4), assets, avgT };
+  }
+
+  /* ---------------- rendering ---------------- */
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+  function topbarHTML() {
+    const gLevel = Math.min(100, Math.round(totalAssets() / (12 * monthlyExpense()) * 100));
+    return `
+    <div class="topbar">
+      <div class="topbar-row">
+        <span class="year-chip">${esc(t("ui.year"))} ${S.year}/20</span>
+        <span class="money-chip ${S.debt > 0 ? "debt" : ""}">
+          ${S.debt > 0 ? esc(t("ui.debt")) + " " + rupees(S.debt) : rupees(totalAssets())}
+        </span>
+        <button class="iconbtn" id="muteBtn" aria-label="${esc(t("ui.mute"))}">${muted() ? "🔇" : "🔊"}</button>
+        <button class="iconbtn" id="resetBtn" aria-label="reset">↺</button>
+      </div>
+      <div class="gullak-wrap">
+        <div class="gullak" id="gullak"><div class="pot"><div class="level" style="height:${gLevel}%"></div></div><div class="coin"></div></div>
+        <div class="meters">
+          ${meterHTML("sehat", "health", S.health)}
+          ${meterHTML("tension", "tension", S.tension)}
+          ${meterHTML("suraksha", "suraksha", surakshaScore())}
+        </div>
+      </div>
+      <div class="gullak-info">${esc(t("ui.gullak"))}: ${rupees(totalAssets())}</div>
+    </div>`;
+  }
+  function meterHTML(labelKey, cls, val) {
+    return `<div class="meter"><label>${esc(t("ui." + labelKey))}<span>${Math.round(val)}</span></label>
+      <div class="bar"><div class="fill ${cls}" style="width:${val}%"></div></div></div>`;
+  }
+  function shell(inner, buttonLabel, onButton, secondary) {
+    app.innerHTML = topbarHTML() + `<div class="stage">${inner}</div>` +
+      (buttonLabel ? `<div class="bottombar">
+        <button class="btn-primary" id="mainBtn">${esc(buttonLabel)}</button>
+        ${secondary ? `<button class="btn-secondary" id="secBtn">${esc(secondary.label)}</button>` : ""}
+      </div>` : "");
+    wireTopbar();
+    if (buttonLabel) document.getElementById("mainBtn").onclick = () => { sfx.click(); onButton(); };
+    if (secondary) document.getElementById("secBtn").onclick = () => { sfx.click(); secondary.fn(); };
+  }
+  function wireTopbar() {
+    const m = document.getElementById("muteBtn"), r = document.getElementById("resetBtn");
+    if (m) m.onclick = () => { localStorage.setItem(MUTE_KEY, muted() ? "0" : "1"); m.textContent = muted() ? "🔇" : "🔊"; };
+    if (r) r.onclick = () => { if (confirm(t("ui.reset"))) { localStorage.removeItem(SAVE_KEY); location.reload(); } };
+  }
+  function coinDrop() {
+    const g = document.getElementById("gullak");
+    if (g) { g.classList.remove("drop"); void g.offsetWidth; g.classList.add("drop"); }
+    sfx.coin();
+  }
+
+  /* ---------------- screens ---------------- */
+  function renderTitle() {
+    const hasSave = !!loadSave();
+    const lang = localStorage.getItem(LANG_KEY) || "en";
+    app.innerHTML = `
+    <div class="title-screen">
+      <div class="title-art">🪔👩🏽‍🦱🏙️</div>
+      <h1>${esc(t("ui.title"))}</h1>
+      <p class="tagline">${esc(t("ui.tagline"))}</p>
+      <div class="lang-row">
+        <button class="lang-btn ${lang === "en" ? "active" : ""}" data-l="en">English</button>
+        <button class="lang-btn ${lang === "hi" ? "active" : ""}" data-l="hi">हिंदी</button>
+        <button class="lang-btn ${lang === "mr" ? "active" : ""}" data-l="mr">मराठी</button>
+      </div>
+      <div class="bottombar" style="position:relative;padding:20px 0 0;background:none;transform:none;left:0;">
+        ${hasSave ? `<button class="btn-primary" id="contBtn">${esc(t("ui.continue"))}</button>` : ""}
+        <button class="${hasSave ? "btn-secondary" : "btn-primary"}" id="newBtn">${esc(t("ui.start"))}</button>
+      </div>
+      <p style="font-size:12px;opacity:.7;margin-top:18px;">${esc(t("ui.savedAuto"))}<br>${esc(t("ui.installHint"))}</p>
+    </div>`;
+    document.querySelectorAll(".lang-btn").forEach(b => b.onclick = async () => {
+      localStorage.setItem(LANG_KEY, b.dataset.l);
+      await loadLang(b.dataset.l); renderTitle();
+    });
+    const c = document.getElementById("contBtn");
+    if (c) c.onclick = () => { S = loadSave(); route(); };
+    document.getElementById("newBtn").onclick = () => { sfx.click(); renderSetup(); };
+  }
+
+  function renderSetup() {
+    let charId = "meena", incomeIdx = 1;
+    function draw() {
+      const chars = STORY.characters.map(c => `
+        <div class="char-card ${c.id === charId ? "active" : ""}" data-c="${c.id}">
+          <div class="char-emoji">${c.emoji}</div>
+          <div><h3>${esc(t("char." + c.id + ".n"))}</h3><p>${esc(t("char." + c.id + ".d"))}</p></div>
+        </div>`).join("");
+      const incs = STORY.incomes.map((inc, i) => `
+        <button class="income-btn ${i === incomeIdx ? "active" : ""}" data-i="${i}">${rupees(inc.personal)}</button>`).join("");
+      app.innerHTML = `
+      <div class="title-screen">
+        <h1 style="font-size:26px;">${esc(t("ui.chooseChar"))}</h1>
+        <div class="char-grid">${chars}</div>
+        <div class="section-label">${esc(t("ui.chooseIncome"))}</div>
+        <div class="income-row">${incs}</div>
+        <p style="font-size:13px;text-align:left;margin-top:8px;">${esc(t("ui.householdNote", { h: rupees(STORY.incomes[incomeIdx].household) }))}</p>
+        <div class="bottombar" style="position:relative;padding:18px 0 0;background:none;transform:none;left:0;">
+          <button class="btn-primary" id="beginBtn">${esc(t("ui.begin"))}</button>
+        </div>
+      </div>`;
+      document.querySelectorAll(".char-card").forEach(el => el.onclick = () => { charId = el.dataset.c; sfx.click(); draw(); });
+      document.querySelectorAll(".income-btn").forEach(el => el.onclick = () => { incomeIdx = +el.dataset.i; sfx.click(); draw(); });
+      document.getElementById("beginBtn").onclick = () => {
+        S = newState(charId, incomeIdx); sfx.good(); save(); route();
+      };
+    }
+    draw();
+  }
+
+  function chapter() { return STORY.chapters[S.chapterIdx]; }
+
+  function route() {
+    save();
+    if (!S) return renderTitle();
+    switch (S.phase) {
+      case "chapterIntro": return renderChapterIntro();
+      case "news": return renderNews();
+      case "event": return renderEvent();
+      case "funding": return renderFunding();
+      case "screen": return renderScreen();
+      case "album": return renderAlbum(false);
+      case "timepass": return renderTimepass();
+      case "ending": return renderEnding();
+      default: return renderTitle();
+    }
+  }
+
+  function renderChapterIntro() {
+    const ch = chapter();
+    const char = STORY.characters.find(c => c.id === S.charId);
+    shell(`
+      <div class="chapter-card">
+        <div class="ch-no">${esc(t("ui.chapter"))} ${S.chapterIdx + 1}/8</div>
+        <h2>${esc(t(ch.id + ".t"))}</h2>
+        <div class="ch-year">${esc(t(ch.id + ".sub"))}</div>
+      </div>
+      <div class="scene">
+        <div class="big-emoji">${char.emoji}</div>
+        <p>${esc(t(ch.id + ".intro", { p: S.personal.toLocaleString("en-IN") }))}</p>
+      </div>`,
+      t("ui.next"), () => {
+        if (S.news.length) { S.phase = "news"; }
+        else if (ch.event) { S.phase = "event"; }
+        else { S.phase = "screen"; S.screenIdx = 0; }
+        route();
+      });
+  }
+
+  function renderNews() {
+    const n = S.news.shift();
+    shell(`
+      <div class="scene chat">
+        <div class="speaker">📰 ${esc(t("news." + n + ".t"))}</div>
+        <p>${esc(t("news." + n + ".b"))}</p>
+      </div>`,
+      t("ui.next"), () => {
+        if (S.news.length) { S.phase = "news"; }
+        else if (chapter().event && !S.flags["evDone_" + chapter().id]) { S.phase = "event"; }
+        else { S.phase = "screen"; S.screenIdx = Math.max(0, S.screenIdx); }
+        route();
+      });
+    sfx.sting();
+  }
+
+  function renderEvent() {
+    const ch = chapter();
+    const evId = pickEvent(ch.event.pool);
+    S.flags["evDone_" + ch.id] = true;
+    const ev = STORY.events[evId];
+    const result = resolveEvent(evId);
+    save();
+    shell(`
+      <div class="scene" style="background:#FDE0D9;">
+        <div class="big-emoji">${ev.emoji}</div>
+        <div class="speaker">⚡ ${esc(t("ev." + evId + ".t"))}</div>
+        <p>${esc(t("ev." + evId + ".b"))}</p>
+      </div>
+      ${result.lines.map(l => `<div class="feedback ${S.pendingShortfall ? "bad" : "neutral"}">${esc(l)}</div>`).join("")}`,
+      t("ui.next"), () => {
+        if (S.pendingShortfall > 0) S.phase = "funding";
+        else { S.phase = "screen"; S.screenIdx = 0; }
+        route();
+      });
+    sfx.sting();
+  }
+
+  function renderFunding() {
+    const short = S.pendingShortfall;
+    const opts = [];
+    opts.push({ id: "sahukar", emoji: "🧔", fb: "fund.sahukarfb", act: () => { S.debt += short; } });
+    opts.push({ id: "app", emoji: "📱", fb: "fund.appfb", act: () => { S.debt += short; } });
+    if (S.pots.chit > 0) opts.push({ id: "chit", emoji: "🧕", fb: "fund.chitfb", act: () => {
+      const got = Math.round(S.pots.chit * 0.8); S.pots.chit = 0; delete S.autos.chit; S.chitDone = true;
+      if (got < short) S.debt += short - got; else S.pots.cash += got - short;
+    }});
+    if (S.pots.gold > 0) opts.push({ id: "gold", emoji: "🪙", fb: "fund.goldfb", act: () => {
+      const got = Math.round(S.pots.gold * 0.9); S.pots.gold = 0;
+      if (got < short) S.debt += short - got; else S.pots.cash += got - short;
+    }});
+    if (S.pots.sip > 0) opts.push({ id: "sip", emoji: "🌱", fb: "fund.sipfb", act: () => {
+      const got = S.pots.sip; S.pots.sip = 0; delete S.autos.sip;
+      if (got < short) S.debt += short - got; else S.pots.cash += got - short;
+    }});
+    shell(`
+      <div class="scene">
+        <div class="speaker">🆘</div>
+        <p>${esc(t("fund.q", { amt: short.toLocaleString("en-IN") }))}</p>
+        <div class="options">
+          ${opts.map((o, i) => `<button class="opt" data-i="${i}">
+            <span class="opt-emoji">${o.emoji}</span><span>${esc(t("fund." + o.id))}</span></button>`).join("")}
+        </div>
+        <div id="fbArea"></div>
+      </div>`);
+    document.querySelectorAll(".opt").forEach(el => el.onclick = () => {
+      const o = opts[+el.dataset.i];
+      o.act(); S.pendingShortfall = 0; clampMeters(); save();
+      (o.id === "sahukar" || o.id === "app") ? sfx.bad() : sfx.coin();
+      document.getElementById("fbArea").innerHTML =
+        `<div class="feedback ${o.id === "sahukar" || o.id === "app" ? "bad" : "neutral"}">${esc(t(o.fb))}</div>`;
+      document.querySelectorAll(".opt").forEach(b => b.disabled = true);
+      app.insertAdjacentHTML("beforeend",
+        `<div class="bottombar"><button class="btn-primary" id="mainBtn">${esc(t("ui.next"))}</button></div>`);
+      document.getElementById("mainBtn").onclick = () => { sfx.click(); S.phase = "screen"; S.screenIdx = 0; route(); };
+    });
+  }
+
+  function visibleOptions(sc) {
+    return sc.options.filter(o =>
+      !(o.hideIfFlag && S.flags[o.hideIfFlag]) && !(o.needFlag && !S.flags[o.needFlag]));
+  }
+
+  function renderScreen() {
+    const ch = chapter();
+    if (S.screenIdx >= ch.screens.length) { S.phase = "timepass"; return route(); }
+    const sc = ch.screens[S.screenIdx];
+    const opts = visibleOptions(sc);
+    shell(`
+      <div class="scene chat">
+        <div class="big-emoji">${sc.emoji || "💬"}</div>
+        <p>${esc(t(sc.id + ".q"))}</p>
+      </div>
+      <div class="options">
+        ${opts.map((o, i) => `<button class="opt" data-i="${i}">
+          <span class="opt-emoji">${o.emoji}</span>
+          <span>${esc(t(sc.id + "." + o.id))}</span>
+          ${o.costLabel ? `<span class="opt-cost">${esc(o.costLabel)}</span>` : ""}
+        </button>`).join("")}
+      </div>
+      <div id="fbArea"></div>`);
+    document.querySelectorAll(".opt").forEach(el => el.onclick = () => {
+      const o = opts[+el.dataset.i];
+      applyEffects(o.effects);
+      if (sc.id === "c6s1") S.scamSeen = true;
+      save();
+      o.tone === "good" ? (coinDrop(), sfx.good()) : o.tone === "bad" ? sfx.bad() : sfx.click();
+      document.querySelectorAll(".opt").forEach(b => { b.disabled = true; if (b !== el) b.style.opacity = .45; });
+      let fb = `<div class="feedback ${o.tone}">${esc(t(sc.id + "." + o.id + "fb"))}</div>`;
+      if (sc.learnmore) fb += `<button class="learnmore-btn" id="lmBtn">${esc(t("ui.aurSamjho"))}</button><div id="lmArea"></div>`;
+      document.getElementById("fbArea").innerHTML = fb;
+      // refresh topbar numbers
+      document.querySelector(".topbar").outerHTML = topbarHTML(); wireTopbar();
+      const lmBtn = document.getElementById("lmBtn");
+      if (lmBtn) lmBtn.onclick = () => {
+        document.getElementById("lmArea").innerHTML = `
+          <div class="learnmore"><h4>${esc(t(sc.learnmore.key + ".t"))}</h4>
+          ${esc(t(sc.learnmore.key + ".b"))}<br>
+          <a href="${sc.learnmore.video}" target="_blank" rel="noopener">${esc(t("ui.video"))}</a></div>`;
+        lmBtn.remove();
+      };
+      app.insertAdjacentHTML("beforeend",
+        `<div class="bottombar"><button class="btn-primary" id="mainBtn">${esc(t("ui.next"))}</button></div>`);
+      document.getElementById("mainBtn").onclick = () => {
+        sfx.click(); S.screenIdx++; S.phase = "screen"; route();
+      };
+    });
+  }
+
+  function renderTimepass() {
+    const nextCh = STORY.chapters[S.chapterIdx + 1];
+    if (!nextCh) { S.phase = "ending"; return route(); }
+    const yrs = nextCh.year - chapter().year;
+    shell(`
+      <div class="scene" style="text-align:center;">
+        <div class="big-emoji">⏳</div>
+        <p>${esc(t("ui.timepass", { n: yrs }))}</p>
+      </div>`,
+      t("ui.next"), () => {
+        advanceYears(yrs);
+        S.chapterIdx++; S.screenIdx = -1;
+        S.phase = nextCh.album ? "album" : "chapterIntro";
+        route();
+      });
+  }
+
+  function albumTone() {
+    const a = totalAssets();
+    if (S.debt > 15000 || a < monthlyExpense()) return "bad";
+    if (a < 4 * monthlyExpense()) return "mid";
+    return "good";
+  }
+  function renderAlbum() {
+    const tone = albumTone();
+    const rooms = { good: "🛏️🪟🧺🖼️🌼", mid: "🛏️🪟🧺", bad: "🛏️🕳️" };
+    shell(`
+      <div class="album">
+        <h3>${esc(t("album.t", { y: chapter().year }))}</h3>
+        <div class="room">${rooms[tone]}</div>
+        <p>${esc(t("album." + tone))}</p>
+        <span class="stat">${esc(t("album.stats", { a: rupees(totalAssets()), d: rupees(S.debt) }))}</span>
+      </div>`,
+      t("ui.next"), () => { S.phase = "chapterIntro"; route(); });
+    tone === "good" ? sfx.good() : tone === "bad" ? sfx.bad() : sfx.click();
+  }
+
+  /* ---------------- ending + share ---------------- */
+  function renderEnding() {
+    const E = computeEnding();
+    const badges = { 1: "🕳️", 2: "🌧️", 3: "🌤️", 4: "🌟" };
+    const extra = [];
+    if (S.flags.eduKept) extra.push(t("end.edu"));
+    if (S.flags.eduPulled) extra.push(t("end.eduPulled"));
+    if (S.flags.mentor) extra.push(t("end.mentor"));
+    if (S.flags.widowed) extra.push(t("end.widow"));
+    shell(`
+      <div class="chapter-card"><h2>${esc(t("end.t"))}</h2></div>
+      <div class="album tier-${E.tier}">
+        <div class="tier-badge">${badges[E.tier]}</div>
+        <h3>${esc(t("end.tier" + E.tier + ".t"))}</h3>
+        <p>${esc(t("end.tier" + E.tier + ".b"))}</p>
+        <span class="stat">${esc(t("end.assets", { a: rupees(E.assets) }))}</span>
+        ${S.debt > 0 ? `<span class="stat">${esc(t("end.debtLine", { d: rupees(S.debt) }))}</span>` : ""}
+        ${S.flags.apy ? `<span class="stat">${esc(t("end.pension"))}</span>` : ""}
+        <p>${esc(t("end.ail." + E.ail))}</p>
+        ${extra.map(x => `<p>${esc(x)}</p>`).join("")}
+      </div>
+      <div class="scene">
+        <div class="speaker">${esc(t("ui.lessonsTitle"))}</div>
+        <ul class="lesson-list">${E.lessons.map(k => `<li>${esc(t(k))}</li>`).join("")}</ul>
+        <p style="font-size:13px;opacity:.75;">${esc(t("ui.madeWith"))}</p>
+      </div>
+      <canvas id="shareCanvas" width="1080" height="1080"></canvas>`,
+      t("ui.share"), () => shareCard(E),
+      { label: t("ui.playAgain"), fn: () => { localStorage.removeItem(SAVE_KEY); S = null; renderTitle(); } });
+    E.tier >= 3 ? sfx.win() : sfx.sting();
+  }
+
+  function shareCard(E) {
+    const cv = document.getElementById("shareCanvas"), x = cv.getContext("2d");
+    const colors = { 1: "#B3402A", 2: "#8a6d3b", 3: "#146B6A", 4: "#4C8C2B" };
+    x.fillStyle = "#FFF3DC"; x.fillRect(0, 0, 1080, 1080);
+    x.fillStyle = "#D6336C"; x.fillRect(0, 0, 1080, 200);
+    x.fillStyle = "#fff"; x.font = "bold 72px sans-serif"; x.textAlign = "center";
+    x.fillText(t("share.cardTop"), 540, 125);
+    const badges = { 1: "🕳️", 2: "🌧️", 3: "🌤️", 4: "🌟" };
+    x.font = "220px sans-serif"; x.fillText(badges[E.tier], 540, 500);
+    x.fillStyle = colors[E.tier]; x.font = "bold 88px sans-serif";
+    x.fillText(t("end.tier" + E.tier + ".t"), 540, 660);
+    x.fillStyle = "#2E1E12"; x.font = "56px sans-serif";
+    x.fillText(t("end.assets", { a: rupees(E.assets) }), 540, 770);
+    x.fillStyle = "#146B6A"; x.font = "bold 52px sans-serif";
+    x.fillText(t("share.cardBottom"), 540, 950);
+    cv.toBlob(async (blob) => {
+      const file = new File([blob], "meena-result.png", { type: "image/png" });
+      const text = t("share.text", { tier: t("end.tier" + E.tier + ".t"), a: rupees(E.assets) }) + " " + location.href;
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try { await navigator.share({ files: [file], text }); return; } catch (e) {}
+      }
+      if (navigator.share) { try { await navigator.share({ text }); return; } catch (e) {} }
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = "meena-result.png"; a.click();
+      alert(t("ui.shareFail"));
+    });
+  }
+
+  /* ---------------- boot ---------------- */
+  async function loadLang(lang) {
+    const res = await fetch("data/lang/" + lang + ".json");
+    L = await res.json();
+  }
+  async function boot() {
+    try {
+      const res = await fetch("data/story.json");
+      STORY = await res.json();
+      const lang = localStorage.getItem(LANG_KEY) || "en";
+      await loadLang(lang);
+      const saved = loadSave();
+      if (saved) { S = saved; if (S.lang) await loadLang(S.lang); }
+      if (S) S.lang = localStorage.getItem(LANG_KEY) || "en";
+      renderTitle();
+    } catch (e) {
+      app.innerHTML = "<div class='boot'><p>Could not load game files. If you opened index.html directly, please run a local server (see SETUP_GUIDE.md) or deploy to Netlify/GitHub Pages.</p></div>";
+    }
+  }
+  boot();
+})();
