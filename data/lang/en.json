@@ -28,18 +28,15 @@
   "ui.savedAuto": "Progress saves automatically on this phone.",
   "ui.lessonsTitle": "What Meena's life taught us:",
   "ui.madeWith": "Free & open source. Share it with someone who needs it. ❤️",
-
   "char.meena.n": "Meena, 22",
   "char.meena.d": "Garment factory worker in Mumbai. Came from a village in UP. Sharp, saves nothing… yet.",
   "char.sunita.n": "Sunita, 24",
   "char.sunita.d": "Beautician in a Thane parlour. Dreams big, spends bigger. Instagram expert.",
   "char.rekha.n": "Rekha, 26",
   "char.rekha.d": "Works in 4 houses in Andheri. Husband drives an auto. Strongest person you'll meet.",
-
   "ch1.t": "Pehli Kamai",
   "ch1.sub": "Year 1 — First salary!",
   "ch1.intro": "Meena holds her first salary. ₹{p}! In the village this was 3 months of money. Mumbai mein sab kuch possible lagta hai… and everyone has advice. 🎉",
-
   "c1s1.q": "Roommate Pinky shows her phone: \"New phone le le! Sirf ₹1,200 per month EMI. Reels bhi HD mein!\" Meena's old phone works fine… mostly.",
   "c1s1.o1": "Take the EMI! Life mein thoda swag chahiye",
   "c1s1.o1fb": "New phone! 🤳 But now ₹1,200 leaves every month for 2 YEARS — ₹28,800 total for a ₹24,000 phone. The EMI eats first, Meena eats later.",
@@ -47,7 +44,6 @@
   "c1s1.o2fb": "Boring choice? Wait and watch. ₹500/month quietly becomes a wall between Meena and every future emergency. 🪔",
   "c1s1.o3": "Buy a good secondhand phone in cash",
   "c1s1.o3fb": "Smart jugaad! ₹6,000 gone but NO monthly EMI chain. Phone bhi mila, azaadi bhi.",
-
   "c1s2.q": "Lunch break. Shanta Tai from packing dept whispers: \"Beti, hamari committee join kar le. ₹1,000 monthly. Lucky draw mein poora ₹50,000 milta hai!\" Everyone calls her Chit Fund Aunty.",
   "c1s2.o1": "Join the committee! Sab log kar rahe hain",
   "c1s2.o1fb": "Joined! Committees DO work sometimes… if the organiser is honest and stays in town. That's a big IF. No paper, no proof, no complaint possible. 🤞",
@@ -55,7 +51,6 @@
   "c1s2.o2fb": "Tai made a face 😒 but Meena's money stays where Meena can see it.",
   "c1s2.o3": "Ask: \"Tai, agar aap chali gayi toh mera paisa?\"",
   "c1s2.o3fb": "Tai laughed nervously and changed the topic. 🚩 That silence was the real answer. Meena stayed out.",
-
   "c1s3.q": "A camp outside the factory: \"e-Shram card banwao — FREE! Government ID for workers. Accident insurance included.\" The line is long and it's hot. 🥵",
   "c1s3.o1": "Stand in line, register",
   "c1s3.o1fb": "30 minutes of sweat = a government ID that unlocks schemes, accident cover, and proof she EXISTS in the system. Best free thing in Mumbai. 🪪✨",
@@ -63,7 +58,6 @@
   "c1s3.o2fb": "The camp left the next day. Kal-kal karte 2 saal nikal jaayenge. 😅",
   "c1s3.o3": "Skip it, go for vada pav with friends",
   "c1s3.o3fb": "The vada pav was legendary 🤤. The card would have been more legendary. Priorities, Meena!",
-
   "c1s4.q": "Phone rings. Bhaiya from the village: \"Behen, festival aa raha hai, ghar ki izzat ka sawaal hai. ₹5,000 bhej de na.\"",
   "c1s4.o1": "Send the full ₹5,000",
   "c1s4.o1fb": "Ghar khush 😊, gullak khaali. Family matters — but if she says yes to everything, who says yes to HER future?",
@@ -71,11 +65,9 @@
   "c1s4.o2fb": "Bhaiya grumbled for 2 minutes, then said theek hai. Boundaries bhi pyaar hai. 💪",
   "c1s4.o3": "Say no this time",
   "c1s4.o3fb": "The call ended coldly. 😔 Saying no has a cost too — tension. There's no perfect answer here, only trade-offs.",
-
   "ch2.t": "Bank ka Chakkar",
   "ch2.sub": "Year 2 — Where should money live?",
   "ch2.intro": "One year in Mumbai done! Meena has some money now and a big question: paisa kahaan rakhein? Everyone has an opinion. Even the doodhwala.",
-
   "c2s1.q": "Meena's savings are growing. Pinky says \"Gadde ke neeche rakh, bank waale chor hain.\" The post office uncle says something about 'RD'. Kya karein?",
   "c2s1.o1": "Under the mattress. Apna paisa apne paas",
   "c2s1.o1fb": "Safe from banks, not safe from rats, rain, theft… or Meena's own shopping moods. And it grows by exactly ₹0. 🐀",
@@ -83,7 +75,6 @@
   "c2s1.o2fb": "Good — safe and earns ~4%. But money lying in savings gets spent. Money that leaves automatically gets SAVED.",
   "c2s1.o3": "Post office RD — ₹1,000 auto-cut every month",
   "c2s1.o3fb": "Government-backed, 6.7% interest, and the best part: the money leaves BEFORE she can spend it. Discipline on autopilot. 📮🔥",
-
   "c2s2.q": "Bank mein ek mela: \"₹436 per year = ₹2 LAKH ka life insurance (PMJJBY). ₹20 per year = ₹2 lakh accident cover (PMSBY).\" Meena: \"Itna sasta? Zaroor koi chakkar hai.\"",
   "c2s2.o1": "Take BOTH — ₹456/year total",
   "c2s2.o1fb": "₹456 a YEAR — that's less than one pizza — for ₹2 lakh protection. It's real, it's government-backed, it auto-cuts from the account. Biggest no-brainer in this game. 🛡️",
@@ -91,13 +82,11 @@
   "c2s2.o2fb": "₹20 for accident cover taken — good start! But the ₹436 life cover protects the family from the BIGGEST shock. Half shield is half shield.",
   "c2s2.o3": "\"Insurance paisa barbaad hai. Mujhe kuch nahi hoga\"",
   "c2s2.o3fb": "Famous last words in every serial. 😬 Insurance feels like waste — until the one day it's the only thing standing between family and ruin.",
-
   "c2s3.q": "Neighbour aunty got FREE heart surgery with an 'Ayushman card'. Free?! ₹5 lakh per year per family, government hospital scheme (PM-JAY). Checking eligibility takes one visit.",
   "c2s3.o1": "Go check eligibility & make the card",
   "c2s3.o1fb": "Card ban gaya! ₹5 lakh/year of hospital cover for the whole family. Crores of eligible families never check. Meena checked. 🏥👑",
   "c2s3.o2": "\"Hospital jaane ki naubat hi nahi aayegi\"",
   "c2s3.o2fb": "Nazar na lage 🧿 …but hospitals don't send invitations. They send bills.",
-
   "c2s4.q": "GOOD NEWS! Supervisor: \"Meena, kaam accha hai. ₹2,000 raise!\" Pinky already has plans for it. So does Meena's landlord, probably.",
   "c2s4.o1": "Put the raise into RD before it disappears",
   "c2s4.o1fb": "The golden rule: jitni kamai badhe, utni bachat badhao. Meena won't even miss money she never saw. 🧠",
@@ -105,21 +94,17 @@
   "c2s4.o2fb": "New kurtis, better tiffin, some fun. Zindagi bhi zaroori hai — as long as the OLD savings keep running. Balance.",
   "c2s4.o3": "Send more home every month",
   "c2s4.o3fb": "Maa ki dua sabse bada return hai 🙏 — and family goodwill is real security too. Just don't let YOUR pot stay empty.",
-
   "ch3.t": "Baarish",
   "ch3.sub": "Year 3 — The test",
   "ch3.intro": "Mumbai monsoon. Romantic in movies. In real life? The sky opens… and life throws its first REAL test at Meena. ⛈️",
-
   "ev.ev_dengue.t": "Dengue!",
   "ev.ev_dengue.b": "Maa comes to visit, and the mosquito strikes. High fever, platelets falling, private hospital: \"Admit karna padega. Around ₹35,000.\"",
   "ev.ev_flood.t": "Paani ghar mein!",
   "ev.ev_flood.b": "The worst rain in years. Meena's kholi floods — mattress, stove, clothes, phone charger, sab gaya. Rebuilding needs about ₹25,000.",
-
   "ev.free": "🛡️ AYUSHMAN CARD ZINDABAD! The hospital bill: ₹0. That boring card just saved the family. Meena walks out with Maa and her savings intact.",
   "ev.payout": "🛡️ Insurance payout received: ₹{amt}! The shield worked exactly when it was needed.",
   "ev.paidCash": "The gullak took the hit: ₹{amt} gone. It hurts… but THIS is why the emergency fund existed. No beggar's bowl, no moneylender. 💪",
   "ev.shortfall": "Savings weren't enough. ₹{amt} is still needed — and it's needed TODAY. Who to ask?",
-
   "fund.q": "₹{amt} chahiye. Abhi. Options saamne hain:",
   "fund.sahukar": "Sahukar (moneylender) — instant cash, 'thoda' byaj",
   "fund.sahukarfb": "Instant money, invisible chains. 3% per month means the debt GROWS faster than Meena can run. This hole gets deeper while she sleeps. 🕳️",
@@ -131,7 +116,6 @@
   "fund.goldfb": "The gold went for less than it was bought (making charges are a one-way toll). But it saved the day — that's what assets are for.",
   "fund.sip": "Redeem the SIP money",
   "fund.sipfb": "SIP redeemed in 2 days. This is why SIP > gold locker > committee: when trouble comes, the money actually COMES.",
-
   "c3s2.q": "The storm passed. Meena stares at the ceiling that night, thinking: \"Agli baar…?\" What does she promise herself?",
   "c3s2.o1": "Build an emergency fund — ₹500/month minimum, no matter what",
   "c3s2.o1fb": "Target: 3 months of expenses, kept boring and reachable. An emergency fund isn't an investment — it's a seatbelt. 🪔",
@@ -139,11 +123,9 @@
   "c3s2.o2fb": "Done — ₹2 lakh life + accident cover for the family. Never again 'kaash le liya hota'.",
   "c3s2.o3": "\"Jo hoga dekha jayega\"",
   "c3s2.o3fb": "Meena, beta… 'dekha jayega' is not a plan, it's a prayer. The game continues. So does the risk. 😬",
-
   "ch4.t": "Shaadi aur Sona",
   "ch4.sub": "Year 5 — Wedding season",
   "ch4.intro": "Two weddings this year — cousin's AND devar's. In India, weddings are where love, izzat aur budget ka WWE match hota hai. 🥊💒",
-
   "c4s1.q": "The jeweller near the station: \"Madam, GOLD SCHEME! 11 installments do, 12th FREE!\" Everyone in the building is doing it. Cousin's wedding gift is due too.",
   "c4s1.o1": "Join the jeweller's gold scheme, ₹1,000/month",
   "c4s1.o1fb": "The '12th free' sounds like 9% return — but making charges (8-25%!) quietly eat it. And you can ONLY buy jewellery from HIM. Sona to hai, par sasta nahi. ✨",
@@ -151,7 +133,6 @@
   "c4s1.o2fb": "A coin (not jewellery) skips heavy making charges. Gold protects against bad times, grows slowly. Old-school, not stupid.",
   "c4s1.o3": "Gift ₹2,001 cash with love, skip the gold race",
   "c4s1.o3fb": "Shagun done, izzat intact, budget alive. The wedding was lovely. Nobody checked the gift's weight. 🧧",
-
   "c4s2.q": "Devar's wedding. In-laws hint LOUDLY: \"Bade ghar se badi cheez aani chahiye…\" Log kya kahenge pressure = 100.",
   "c4s2.o1": "Take a ₹30,000 loan. Izzat ka sawaal hai!",
   "c4s2.o1fb": "The function was grand for 1 day. The loan will attend the family for YEARS, growing every month. Log 2 din baad bhool gaye. Karz nahi bhoolta. 💸",
@@ -159,7 +140,6 @@
   "c4s2.o2fb": "Two aunties taunted. It stung. But 'log kya kahenge' doesn't pay EMIs — Meena does. Respect built on debt is rent, not ownership. 🛡️",
   "c4s2.o3": "Sit with husband, agree on ₹10,000 together",
   "c4s2.o3fb": "They decided TOGETHER — and presented a united front. A couple that plans money together, survives weddings together. 🤝",
-
   "c4s3.q": "Husband's eyes are shining: \"Nayi bike le lein? Sirf ₹60,000. Loan easily mil jayega. Auto se better hai!\"",
   "c4s3.o1": "New bike on full loan",
   "c4s3.o1fb": "Vroom vroom 🏍️ …every month ₹2,800 EMI bhi vroom vroom. A bike loses value the day it's bought; the loan doesn't.",
@@ -167,11 +147,9 @@
   "c4s3.o2fb": "₹25,000, no EMI, same wind in the hair. Secondhand ki koi izzat kam nahi hoti on the highway.",
   "c4s3.o3": "\"Ek saal ruko — save karke lenge\"",
   "c4s3.o3fb": "He sulked for a week 😤. But saving-then-buying vs loan-then-crying is THE habit that separates the two endings of this game.",
-
   "ch5.t": "Nanhi Pari",
   "ch5.sub": "Year 7 — A daughter arrives",
   "ch5.intro": "A baby girl! 👶🌸 The kholi is louder, sweeter, and more expensive. Suddenly 20 saal baad wala future feels very, very real.",
-
   "c5s1.q": "At the post office for the RD, the clerk says: \"Beti hui hai? Sukanya Samriddhi khol lo — 8.2% interest, sabse zyada, beti ke naam.\" That evening an LIC agent uncle also visits with a 'special child plan'.",
   "c5s1.o1": "Open Sukanya Samriddhi (SSY), ₹500/month",
   "c5s1.o1fb": "8.2% — the HIGHEST government-guaranteed rate anywhere, tax-free, locked for her daughter's education/wedding. The single best scheme in this game. 🌸👑",
@@ -179,7 +157,6 @@
   "c5s1.o2fb": "SSY can only be opened before she turns 10 — and every year of 8.2% compounding lost never comes back. 'Baad mein' is expensive.",
   "c5s1.o3": "Agent uncle's child plan — \"paisa bhi wapas, insurance bhi!\"",
   "c5s1.o3fb": "Plans that mix insurance + investment usually do BOTH badly (~4-5% return, heavy lock-in, agent gets fat commission). That's why uncle came to YOUR house. 🧐",
-
   "c5s2.q": "Maternity break — 6 months of lower income. The RD auto-cut is due and money is tight. Post office uncle offers options.",
   "c5s2.o1": "Pause new savings for a few months, protect the base",
   "c5s2.o1fb": "Pausing is PLANNING, not failing. The old money keeps growing untouched. Restart when income returns. 🧘‍♀️",
@@ -187,7 +164,6 @@
   "c5s2.o2fb": "Money came, minus a premature-closure haircut. Sometimes needed — but breaking savings for regular months (not emergencies) becomes a habit fast.",
   "c5s2.o3": "Borrow ₹15,000 'chhota sa' from sahukar to keep face",
   "c5s2.o3fb": "Borrowing at 36%/year to SAVE at 6.7%?! That's filling the gullak with one hand and emptying it with a shovel. 🕳️",
-
   "c5s3.q": "Saas declares: \"Beti ke liye SONA jodo, yeh sarkari kaagaz-waagaz kuch nahi.\" She means well. She also stores cash in a steel dabba.",
   "c5s3.o1": "Respect elders — gold it is",
   "c5s3.o1fb": "Gold is family tradition and real backup. Just remember: it earns nothing monthly, and selling it in crisis always fetches less than the sticker.",
@@ -195,11 +171,9 @@
   "c5s3.o2fb": "Saas was suspicious until Meena showed the passbook printing interest every year. Sarkar-backed, beti ke naam. Even the dabba approved. 🌸",
   "c5s3.o3": "Half gold (for Saas), half SSY (for math)",
   "c5s3.o3fb": "Ghar ki shanti + beti ka future. Diplomacy level: LEGENDARY. 🕊️",
-
   "ch6.t": "Paisa Double?",
   "ch6.sub": "Year 10 — Temptation season",
   "ch6.intro": "Year 10. Income is better, the daughter is in school, and suddenly EVERYONE has a 'scheme' for Meena's money. Beware the shiny things. ✨🪤",
-
   "c6s1.q": "Jethji is GLOWING: \"₹50,000 lagao, 2 saal mein DOUBLE. Guaranteed! Company foreign ki hai. Maine bhi lagaya hai!\"",
   "c6s1.o1": "Invest ₹50,000 — Jethji trust-worthy hai",
   "c6s1.o1fb": "First payout came ON TIME 🤩 — that's the hook. Real 'double guaranteed' doesn't exist; schemes pay early birds with new birds' money. Watch this space…",
@@ -207,7 +181,6 @@
   "c6s1.o2fb": "'Only' ₹10,000 — that's 20 RD months! The first payout will come, they ALWAYS pay first. That's how they reel in the ₹50,000 later. 🪝",
   "c6s1.o3": "\"Jo cheez double hoti hai, wo dhokha bhi double deti hai\" — refuse",
   "c6s1.o3fb": "Jethji called her darpok. Rule of the game: guaranteed high return = guaranteed lie. Sarkar deposits pe 7-8% dete hain; koi 100% de raha hai toh WHY? 🚫🧠",
-
   "c6s2.q": "Colleague Rupa shows her phone: \"Main ₹500 monthly SIP karti hoon, mutual fund mein. 10 saal se. Dekh kitna bana.\" The number is… surprisingly big.",
   "c6s2.o1": "Start a ₹500/month SIP",
   "c6s2.o1fb": "SIP = auto-invest in the market monthly. Some years down, most years up — long term averages ~10-12%. ₹500/month for 10 yrs ≈ ₹1.1-1.2 lakh from ₹60,000 put in. 🌱",
@@ -215,7 +188,6 @@
   "c6s2.o2fb": "Buying ONE stock on a tip is gambling. A SIP in a diversified fund for 10+ years is how crores of ordinary Indians now grow money. Not knowing the difference costs lakhs.",
   "c6s2.o3": "Ask Rupa to help set up ₹1,000/month",
   "c6s2.o3fb": "Set up in 15 minutes on a SEBI-regulated app. Rupa's rule: 'SIP lagao, app delete karo, 10 saal baad kholo.' 🌳",
-
   "c6s3.q": "Every cricket match, the same ad: \"Fantasy team banao, 1 CRORE jeeto!\" Husband's friend 'won' ₹3,000 once. He doesn't mention the ₹40,000 he's put in.",
   "c6s3.o1": "Play daily — ₹100 hi toh hai",
   "c6s3.o1fb": "₹100 daily = ₹36,000/year, quietly. The apps show winners' faces, never the crores of losers funding them. The house always wins. 🎰",
@@ -223,7 +195,6 @@
   "c6s3.o2fb": "Correct. If earning 1 crore was this easy, the app wouldn't need 500 ads to convince you. 📵",
   "c6s3.o3": "Also warn chacha who's been playing daily",
   "c6s3.o3fb": "Chacha got defensive, then quietly checked his transaction history, then went pale. You saved a family some real pain. 🗣️❤️",
-
   "c6s4.q": "Bank manager: \"Meena ji, Atal Pension Yojana — abhi ₹210/month bharo, 60 ke baad ₹5,000 pension EVERY month, guaranteed, zindagi bhar.\" Budhapa suddenly enters the chat.",
   "c6s4.o1": "Enroll — ₹210/month for ₹5,000/month pension at 60",
   "c6s4.o1fb": "For unorganised workers there's no company pension — APY IS the pension. Government-guaranteed. Future-Meena will touch present-Meena's feet. 🌅",
@@ -231,21 +202,17 @@
   "c6s4.o2fb": "That's exactly why it's cheap NOW. Join late and the monthly amount jumps up. Old age comes for everyone — pension only for planners.",
   "c6s4.o3": "Start smaller — ₹1,000 pension level",
   "c6s4.o3fb": "Smart start! Even a small guaranteed pension means bujhapa mein kisi ke saamne haath nahi phailana. Can upgrade later. 🌄",
-
   "ch7.t": "Toofan",
   "ch7.sub": "Year 15 — The big storm",
   "ch7.intro": "15 years in Mumbai. The daughter is in school, life has a rhythm. And then — the phone rings. Some years test everything you've built. ☎️⛈️",
-
   "ev.ev_accident.t": "Accident!",
   "ev.ev_accident.b": "Husband's auto hit by a tempo. He's alive 🙏 but the leg needs surgery + 3 months of rest. Hospital estimate: ₹90,000. His income: zero for 3 months.",
   "ev.ev_joblose.t": "Factory Band!",
   "ev.ev_joblose.b": "The factory shifts to another state overnight. \"Sab ko nikala.\" 4 months pass before Meena finds equal work. No salary, full expenses.",
   "ev.ev_death.t": "Sabse Bura Din",
   "ev.ev_death.b": "A call no one should get. Meena's husband — an accident on the highway. He's gone. 🕯️ Beyond the grief, the house now runs on one income, and last rites cost ₹30,000.",
-
-  "ev.death.pmjjby": "Amid the darkness, the bank calls: the ₹436/year PMJJBY policy pays the family ₹2,00,000. It doesn't fill the chair at dinner. But the daughter stays in school, the kholi stays theirs, and grief doesn't have to become debt. 🕯️🛡️",
+  "ev.death.pmjjby": "Amid the darkness, the bank calls: that ₹436-a-year family life cover (PMJJBY) pays ₹2,00,000. It doesn't fill the chair at dinner. But the daughter stays in school, the kholi stays theirs, and grief doesn't have to become debt. 🕯️🛡️",
   "ev.death.nopolicy": "There is no policy. There is no payout. Grief comes with a begging bowl — relatives, sahukar, whoever will give. This is the ₹436 that was never paid. 🕯️",
-
   "c7s2.q": "In the middle of the crisis, the school fee notice arrives: ₹15,000 for the daughter's year. The neighbour says \"Ladki hai, ghar baitha lo, paisa bachega.\"",
   "c7s2.o1": "Pay the fees. Education is non-negotiable",
   "c7s2.o1fb": "The single highest-return investment in this entire game is that girl finishing school. Every rupee here multiplies for 50 years. 📚👑",
@@ -253,11 +220,9 @@
   "c7s2.o2fb": "One 'temporary' break — and statistically most girls never return. The saving today is tiny; the cost is her whole earning life. This wound shows up in the ending. 💔",
   "c7s2.o3": "Hunt for scholarships with the e-Shram/labour card",
   "c7s2.o3fb": "Because Meena was IN the system, the system had doors: labour-card education aid cut the cost. Registered workers' kids have schemes most people never claim. 🔍✨",
-
   "ch8.t": "Sukoon?",
   "ch8.sub": "Year 20 — Harvest time",
   "ch8.intro": "20 years since that first salary. Grey strands in the hair, a teenage daughter with opinions 🙄, and decisions that now shape RETIREMENT, not just next month.",
-
   "c8s1.q": "Bhaiya calls about the village land: \"Ek builder poochh raha hai. Bech dein? Ya cousin ko kheti pe de dein?\"",
   "c8s1.o1": "Sell it — ₹1,50,000 cash now",
   "c8s1.o1fb": "Cash in hand feels powerful — and disappears the fastest of all assets. Land sold in a hurry is sold cheap, and it never comes back.",
@@ -265,7 +230,6 @@
   "c8s1.o2fb": "The land now SENDS money instead of just sitting there. An asset that pays monthly is a pension with soil. 🌱",
   "c8s1.o3": "Let it lie, decide later",
   "c8s1.o3fb": "No harm done — but idle land earns nothing and invites 'kabza' headaches. Assets should work, not nap.",
-
   "c8s2.q": "The daughter is 13 and topping her class 🏆. Her SSY/college fund is the question of the decade now.",
   "c8s2.o1": "Boost the SSY with a ₹10,000 lump sum",
   "c8s2.o1fb": "Every rupee at 8.2% now = college fees, not college LOANS, at 18. The girl who was born in Chapter 5 is going places. 🚀",
@@ -273,19 +237,16 @@
   "c8s2.o2fb": "Steady hai. The compounding is doing its silent work.",
   "c8s2.o3": "No SSY was opened — start a dedicated RD for her now",
   "c8s2.o3fb": "SSY's door closed at age 10 — that ship sailed. But the RD starts TODAY. The best time was 8 years ago; the second-best time is now. 📮",
-
   "c8s3.q": "Sunday. The new girl in the chawl — fresh from the village, first salary in hand, eyeing a phone EMI — asks Meena: \"Didi, aap paise kaise sambhalti ho?\"",
   "c8s3.o1": "Sit her down with chai, tell her everything",
   "c8s3.o1fb": "The circle completes. 🫖 One woman's knowledge, shared, protects a whole building. (Psst — you can do this too. Share this game.)",
   "c8s3.o2": "Smile: \"Bas chal jaata hai\"",
   "c8s3.o2fb": "Fair enough — not everyone's a teacher. But somewhere a phone EMI just got signed… 😅",
-
   "album.t": "📸 Year {y} Album",
   "album.good": "The kholi has a fridge now, and Meena's sleep is deep. Photos on the wall: smiling, unposed.",
   "album.mid": "Managing. The room is the same, the smiles are real but tired. One bad month could shake things.",
   "album.bad": "The room has emptied — things sold, things pawned. Meena's smile in photos doesn't reach her eyes. The sahukar's chit sits under the mattress.",
   "album.stats": "Savings: {a} • Karz: {d}",
-
   "news.chitCollapse.t": "😱 Committee Kaand!",
   "news.chitCollapse.b": "Shanta Tai's committee collapsed — Tai left for the village 'permanently'. Meena's committee money: GONE. No receipt, no case, no recovery. This happens to lakhs of people every year.",
   "news.chitPaid.t": "🎊 Committee Paid Out!",
@@ -294,7 +255,6 @@
   "news.scamGone.b": "The 'double paisa' office is a locked shutter. Phones off. Jethji is not making eye contact. The invested money is gone forever. The early 'profit' was the bait — classic Ponzi.",
   "news.scamDodged.t": "🧠 Bach Gaye!",
   "news.scamDodged.b": "News spreads: the 'double paisa' company vanished with the whole mohalla's money. Jethji lost ₹50,000. Meena's refusal now looks like genius. It wasn't luck — it was one rule: guaranteed double = guaranteed dhokha.",
-
   "end.t": "20 Years Later…",
   "end.tier1.t": "Karz ke Jaal Mein",
   "end.tier1.b": "The debt got in early and never left — it grew every month while sleep shrank. At 45, Meena's BP is high, the room is bare, and the sahukar's number is still the most-dialled. This life deserved better choices. It can have them — replay.",
@@ -304,7 +264,6 @@
   "end.tier3.b": "Insured, funded, steady. When shocks came, they hit a wall of savings and policies instead of hitting the family. Meena sleeps well. The daughter dreams big. This is what boring choices build. 🛡️",
   "end.tier4.t": "Aatmanirbhar",
   "end.tier4.b": "Emergency fund ✔ Insurance ✔ SIP & schemes compounding ✔ Pension locked ✔. At 45, Meena is the woman OTHERS come to for advice — with chai and a passbook. From ₹0 saved to a fortress. 👑",
-
   "end.ail.low": "Health: strong. Some grey hair, all of it earned gracefully. 💪",
   "end.ail.mid": "Health: the years of tension left BP medicines on the shelf. Manageable, but the body kept the score.",
   "end.ail.high": "Health: chronic BP, diabetes, aching joints — decades of money-tension written on the body. Stress compounds too.",
@@ -312,24 +271,20 @@
   "end.eduPulled": "💔 The daughter never returned to school after that year. Her lost earnings are this story's biggest invisible number.",
   "end.mentor": "🫖 Three women in the chawl now have RDs and ₹456 insurance because of Meena's Sunday chai lessons.",
   "end.widow": "🕯️ She carried the family alone after that terrible year — and the family held.",
-
   "end.assets": "Total savings built: {a}",
   "end.debtLine": "Debt remaining: {d}",
   "end.pension": "Pension at 60: guaranteed ✔",
-
   "lesson.efund": "🪔 An emergency fund is a seatbelt — build it BEFORE the accident.",
-  "lesson.ins456": "🛡️ ₹456/year (PMJJBY+PMSBY) = ₹2 lakh cover. Cheapest protection in India.",
+  "lesson.ins456": "🛡️ ₹456/year buys life + accident cover of ₹2 lakh each (the bank schemes PMJJBY + PMSBY). Cheapest protection in India.",
   "lesson.pmjay": "🏥 Check Ayushman (PM-JAY) eligibility — ₹5 lakh/year hospital cover, FREE.",
   "lesson.ssy": "🌸 Daughter under 10? Sukanya Samriddhi @8.2% is unbeatable. Open before it's too late.",
   "lesson.sip": "🌱 SIP small, SIP long, don't peek. ₹500/month grows into lakhs over 15-20 years.",
   "lesson.scam": "🚫 'Guaranteed double' = guaranteed dhokha. Govt gives 7-8%. Anything wildly above: RUN.",
   "lesson.debt": "🕳️ Sahukar/app loans at 30%+ dig faster than you can climb. Avoid, or repay FIRST.",
   "lesson.apy": "🌅 No company pension? Atal Pension Yojana IS your pension. ₹210/month → ₹5,000/month at 60.",
-
   "share.text": "I guided Meena through 20 years of life in 'Meena ki Zindagi' — ending: {tier}! Savings: {a}. Can you do better? Play free:",
   "share.cardTop": "MEENA KI ZINDAGI",
   "share.cardBottom": "Can you do better? Play free!",
-
   "lm.efund.t": "Emergency Fund kya hai?",
   "lm.efund.b": "3 months of expenses, kept aside and NEVER touched except for true emergencies. If monthly kharcha is ₹15,000 → target ₹45,000. Start with ₹500/month. It's not an investment — it's the wall between a bad day and a debt trap.",
   "lm.chit.t": "Committee / Chit Fund — sach kya hai?",
@@ -351,5 +306,7 @@
   "lm.sip.t": "SIP (Systematic Investment Plan)",
   "lm.sip.b": "Auto-invest a fixed amount monthly into a mutual fund. Markets swing year to year, but 10-20 year averages have been ~10-12% for diversified funds. ₹500/month × 20 years ≈ ₹5 lakh from ₹1.2 lakh invested. Use only SEBI-registered apps/funds. Long game only — don't peek, don't panic.",
   "lm.apy.t": "Atal Pension Yojana (APY)",
-  "lm.apy.b": "Government-guaranteed pension for unorganised-sector workers (18-40 to join). Pay a small monthly amount till 60 → fixed pension ₹1,000-₹5,000/month for LIFE, spouse continues after you. At ~30, ₹5,000-pension costs about ₹577/month; younger = cheaper. Enroll at any bank/post office."
+  "lm.apy.b": "Government-guaranteed pension for unorganised-sector workers (18-40 to join). Pay a small monthly amount till 60 → fixed pension ₹1,000-₹5,000/month for LIFE, spouse continues after you. At ~30, ₹5,000-pension costs about ₹577/month; younger = cheaper. Enroll at any bank/post office.",
+  "ui.collection": "Endings collected: {x}/4",
+  "ui.collectionHint": "Every run plays out differently. Can you unlock all four endings?"
 }

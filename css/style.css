@@ -291,3 +291,37 @@ body{
 @media (prefers-reduced-motion: reduce){
   *{animation:none !important; transition:none !important;}
 }
+
+/* ---------- illustrated stage ---------- */
+.stage-wrap{
+  border:3px solid var(--ink); border-radius:var(--radius);
+  overflow:hidden; background:#FBE6B4;
+  box-shadow:4px 4px 0 var(--shadow); margin-bottom:12px;
+  animation:pop .35s ease;
+}
+.stage-wrap svg{display:block; width:100%; height:auto;}
+.stage-wrap.slim{max-height:132px;}
+.stage-wrap.slim svg{margin-top:-6%;}
+
+/* dialogue bubble tail — scene talks to you, not quizzes you */
+.scene.chat{position:relative; margin-top:2px;}
+.scene.chat::before{
+  content:""; position:absolute; top:-12px; left:34px;
+  border:12px solid transparent; border-bottom-color:var(--ink);
+  border-top:none;
+}
+.scene.chat::after{
+  content:""; position:absolute; top:-8px; left:37px;
+  border:9px solid transparent; border-bottom-color:#E7FBEA;
+  border-top:none;
+}
+.scene.chat .big-emoji{font-size:30px; text-align:left; margin:0; float:right; margin-left:8px;}
+
+/* ending collection */
+.collect-row{display:flex; gap:12px; justify-content:center; margin:10px 0;}
+.collect{
+  font-size:34px; width:56px; height:56px; display:flex; align-items:center; justify-content:center;
+  background:#fff; border:2px solid var(--ink); border-radius:14px;
+  box-shadow:3px 3px 0 var(--shadow); opacity:.45;
+}
+.collect.on{opacity:1; background:var(--paper-2);}

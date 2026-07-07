@@ -1,6 +1,6 @@
 /* Meena ki Zindagi — service worker (offline support)
    To force an update after editing game files: change the CACHE version below. */
-const CACHE = "meena-v1";
+const CACHE = "meena-v2";
 const FILES = [
   "./",
   "./index.html",

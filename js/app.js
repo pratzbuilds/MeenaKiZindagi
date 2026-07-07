@@ -58,7 +58,7 @@
   function newState(charId, incomeIdx) {
     const inc = STORY.incomes[incomeIdx];
     return {
-      lang: localStorage.getItem(LANG_KEY) || "en",
+      lang: localStorage.getItem(LANG_KEY) || "hi",
       charId, incomeIdx,
       personal: inc.personal, household: inc.household,
       year: 1, chapterIdx: 0, screenIdx: -1, phase: "chapterIntro",
@@ -290,16 +290,16 @@
   /* ---------------- screens ---------------- */
   function renderTitle() {
     const hasSave = !!loadSave();
-    const lang = localStorage.getItem(LANG_KEY) || "en";
+    const lang = localStorage.getItem(LANG_KEY) || "hi";
     app.innerHTML = `
     <div class="title-screen">
       <div class="title-art">🪔👩🏽‍🦱🏙️</div>
       <h1>${esc(t("ui.title"))}</h1>
       <p class="tagline">${esc(t("ui.tagline"))}</p>
       <div class="lang-row">
-        <button class="lang-btn ${lang === "en" ? "active" : ""}" data-l="en">English</button>
         <button class="lang-btn ${lang === "hi" ? "active" : ""}" data-l="hi">हिंदी</button>
         <button class="lang-btn ${lang === "mr" ? "active" : ""}" data-l="mr">मराठी</button>
+        <button class="lang-btn ${lang === "en" ? "active" : ""}" data-l="en">English</button>
       </div>
       <div class="bottombar" style="position:relative;padding:20px 0 0;background:none;transform:none;left:0;">
         ${hasSave ? `<button class="btn-primary" id="contBtn">${esc(t("ui.continue"))}</button>` : ""}
@@ -373,8 +373,8 @@
         <h2>${esc(t(ch.id + ".t"))}</h2>
         <div class="ch-year">${esc(t(ch.id + ".sub"))}</div>
       </div>
+      ${stageSVG("")}
       <div class="scene">
-        <div class="big-emoji">${char.emoji}</div>
         <p>${esc(t(ch.id + ".intro", { p: S.personal.toLocaleString("en-IN") }))}</p>
       </div>`,
       t("ui.next"), () => {
@@ -474,6 +474,7 @@
     const sc = ch.screens[S.screenIdx];
     const opts = visibleOptions(sc);
     shell(`
+      ${stageSVG("slim")}
       <div class="scene chat">
         <div class="big-emoji">${sc.emoji || "💬"}</div>
         <p>${esc(t(sc.id + ".q"))}</p>
@@ -537,13 +538,115 @@
     if (a < 4 * monthlyExpense()) return "mid";
     return "good";
   }
+
+  /* ---------------- illustrated stage (the scene IS the game) ----------------
+     Flat, warm, chawl-wall style. An artist can later replace this whole
+     function's output with hand-drawn images — see DESIGN_BRIEF.md. */
+  function svgWoman(x, y, sc, o) {
+    const ink = "#2E1E12", skin = "#C68B59";
+    let g = `<g transform="translate(${x},${y}) scale(${sc})">`;
+    g += `<path d="M-17 0 Q0 4 17 0 L23 46 Q0 52 -23 46 Z" fill="${o.sari}" stroke="${ink}" stroke-width="2.5"/>`;
+    g += `<path d="M-13 -26 L13 -26 L17 2 L-17 2 Z" fill="${o.blouse}" stroke="${ink}" stroke-width="2.5"/>`;
+    g += `<path d="M13 -26 L-17 2 L-9 2 L15 -18 Z" fill="${o.sari}" opacity="0.92"/>`;
+    g += `<circle cx="0" cy="-38" r="13" fill="${skin}" stroke="${ink}" stroke-width="2.5"/>`;
+    g += `<path d="M-13 -38 Q-13 -52 0 -52 Q13 -52 13 -38 Q7 -46 0 -46 Q-7 -46 -13 -38 Z" fill="${o.hair}"/>`;
+    g += `<circle cx="13" cy="-31" r="5.5" fill="${o.hair}"/>`;
+    if (o.grey) g += `<path d="M-10 -47 Q-4 -50 2 -49" stroke="#DDD3C4" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+    g += `<circle cx="0" cy="-43" r="1.9" fill="#D6336C"/>`;
+    g += `<circle cx="-4.5" cy="-38" r="1.6" fill="${ink}"/><circle cx="4.5" cy="-38" r="1.6" fill="${ink}"/>`;
+    g += o.smile
+      ? `<path d="M-4 -32 Q0 -28 4 -32" stroke="${ink}" stroke-width="2" fill="none" stroke-linecap="round"/>`
+      : `<path d="M-4 -30.5 Q0 -33 4 -30.5" stroke="${ink}" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+    g += `</g>`;
+    return g;
+  }
+  function svgMan(x, y, sc, o) {
+    const ink = "#2E1E12", skin = "#B57B4B";
+    let g = `<g transform="translate(${x},${y}) scale(${sc})">`;
+    g += `<rect x="-9" y="18" width="7" height="28" fill="#4a3a2c" stroke="${ink}" stroke-width="2"/>`;
+    g += `<rect x="2" y="18" width="7" height="28" fill="#4a3a2c" stroke="${ink}" stroke-width="2"/>`;
+    g += `<path d="M-14 -26 L14 -26 L16 22 L-16 22 Z" fill="${o.kurta}" stroke="${ink}" stroke-width="2.5"/>`;
+    g += `<circle cx="0" cy="-38" r="12" fill="${skin}" stroke="${ink}" stroke-width="2.5"/>`;
+    g += `<path d="M-12 -40 Q-12 -50 0 -50 Q12 -50 12 -40 Q6 -45 0 -45 Q-6 -45 -12 -40 Z" fill="${o.hair}"/>`;
+    g += `<circle cx="-4.5" cy="-39" r="1.6" fill="${ink}"/><circle cx="4.5" cy="-39" r="1.6" fill="${ink}"/>`;
+    g += `<path d="M-5 -33 Q0 -30.5 5 -33" stroke="${ink}" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+    g += `</g>`;
+    return g;
+  }
+  function svgGirl(x, y, sc, o) {
+    const ink = "#2E1E12", skin = "#C68B59";
+    let g = `<g transform="translate(${x},${y}) scale(${sc})">`;
+    g += `<path d="M-4 -20 L4 -20 L14 14 L-14 14 Z" fill="${o.frock}" stroke="${ink}" stroke-width="2.4"/>`;
+    g += `<rect x="-6" y="14" width="4.5" height="14" fill="${skin}" stroke="${ink}" stroke-width="1.8"/>`;
+    g += `<rect x="1.5" y="14" width="4.5" height="14" fill="${skin}" stroke="${ink}" stroke-width="1.8"/>`;
+    g += `<circle cx="0" cy="-30" r="10" fill="${skin}" stroke="${ink}" stroke-width="2.4"/>`;
+    g += `<path d="M-10 -31 Q-10 -41 0 -41 Q10 -41 10 -31 Q5 -37 0 -37 Q-5 -37 -10 -31 Z" fill="#1d1108"/>`;
+    g += `<circle cx="-11" cy="-27" r="3.6" fill="#1d1108"/><circle cx="11" cy="-27" r="3.6" fill="#1d1108"/>`;
+    g += `<circle cx="-3.5" cy="-30" r="1.4" fill="${ink}"/><circle cx="3.5" cy="-30" r="1.4" fill="${ink}"/>`;
+    g += `<path d="M-3 -25 Q0 -22.5 3 -25" stroke="${ink}" stroke-width="1.8" fill="none" stroke-linecap="round"/>`;
+    if (o.book) g += `<rect x="-8" y="-14" width="16" height="11" rx="1.5" fill="#fff" stroke="${ink}" stroke-width="2"/><line x1="0" y1="-14" x2="0" y2="-3" stroke="${ink}" stroke-width="1.6"/>`;
+    g += `</g>`;
+    return g;
+  }
+  function stageSVG(cls) {
+    const ink = "#2E1E12", tone = albumTone(), yr = S.year;
+    const wall = tone === "bad" ? "#D9C6A4" : tone === "mid" ? "#F3DBAB" : "#FBE6B4";
+    const gLevel = Math.min(88, Math.round(totalAssets() / (12 * monthlyExpense()) * 100));
+    let s = `<svg class="${cls || ""}" viewBox="0 0 360 200" xmlns="http://www.w3.org/2000/svg" role="img">`;
+    s += `<rect width="360" height="200" fill="${wall}"/>`;
+    s += `<rect y="158" width="360" height="42" fill="#B98A5A"/><path d="M0 158 Q90 154 180 158 T360 158" stroke="${ink}" stroke-width="2.5" fill="none"/>`;
+    // window with Mumbai sky + towers
+    s += `<rect x="256" y="26" width="76" height="62" fill="#BFE3E0" stroke="${ink}" stroke-width="3"/>`;
+    s += `<rect x="264" y="52" width="12" height="36" fill="#9CC5C2"/><rect x="282" y="42" width="12" height="46" fill="#8FBAB7"/><rect x="300" y="58" width="14" height="30" fill="#9CC5C2"/>`;
+    s += `<line x1="294" y1="26" x2="294" y2="88" stroke="${ink}" stroke-width="2.5"/><line x1="256" y1="57" x2="332" y2="57" stroke="${ink}" stroke-width="2.5"/>`;
+    // shelf
+    s += `<rect x="22" y="86" width="150" height="6" fill="#8a5a2b" stroke="${ink}" stroke-width="2"/>`;
+    s += `<rect x="30" y="66" width="22" height="20" rx="3" fill="#C9CED6" stroke="${ink}" stroke-width="2"/>`; // steel dabba
+    // gullak with visible fill
+    s += `<g><path d="M70 86 Q66 62 92 60 Q118 62 114 86 Z" fill="#C96F33" stroke="${ink}" stroke-width="2.5"/>`;
+    s += `<clipPath id="gk"><path d="M70 86 Q66 62 92 60 Q118 62 114 86 Z"/></clipPath>`;
+    s += `<rect x="66" y="${86 - 24 * gLevel / 100}" width="52" height="${24 * gLevel / 100}" fill="#F5A800" clip-path="url(#gk)"/>`;
+    s += `<rect x="85" y="63" width="14" height="3" rx="1.5" fill="#3A1F0D"/></g>`;
+    // family photos accumulate over the years
+    const photos = Math.min(4, Math.floor(yr / 5));
+    for (let i = 0; i < photos; i++)
+      s += `<rect x="${128 + i * 16}" y="40" width="12" height="15" fill="#fff" stroke="${ink}" stroke-width="2"/><rect x="${130.5 + i * 16}" y="44" width="7" height="8" fill="${["#D6336C","#146B6A","#F5A800","#4C8C2B"][i]}"/>`;
+    if (tone === "good" && yr >= 9)
+      s += `<rect x="196" y="96" width="34" height="62" rx="4" fill="#E4573D" stroke="${ink}" stroke-width="3"/><line x1="199" y1="120" x2="227" y2="120" stroke="${ink}" stroke-width="2.5"/><circle cx="222" cy="110" r="2" fill="${ink}"/>`; // fridge
+    if (tone === "bad") {
+      s += `<path d="M40 14 l7 12 -5 9 8 12" stroke="#8f7a58" stroke-width="3" fill="none" stroke-linecap="round"/>`; // crack
+      s += `<path d="M226 30 q26 12 52 0" stroke="${ink}" stroke-width="1.6" fill="none"/><path d="M238 30 l0 8 M252 31 l0 10 M266 30 l0 7" stroke="${ink}" stroke-width="1.4"/>`; // clothesline
+    }
+    // diya for remembrance
+    if (S.flags.widowed) s += `<g><ellipse cx="152" cy="84" rx="9" ry="4.5" fill="#C96F33" stroke="${ink}" stroke-width="2"/><path d="M152 78 q-3.4 -7 0 -11 q3.4 4 0 11" fill="#F5A800" stroke="#E4573D" stroke-width="1.4"/></g>`;
+    // family
+    const ageIdx = yr <= 3 ? 0 : yr <= 8 ? 1 : yr <= 14 ? 2 : 3;
+    const saris = ["#D6336C", "#146B6A", "#7A4B94", "#B3402A"];
+    s += svgWoman(84, 152, 1.28, {
+      sari: saris[ageIdx], blouse: "#F5A800",
+      hair: ageIdx >= 3 ? "#5d4d3d" : "#1d1108", grey: ageIdx >= 2,
+      smile: tone !== "bad"
+    });
+    if (yr >= 5 && !S.flags.widowed)
+      s += svgMan(150, 152, 1.24, { kurta: tone === "bad" ? "#9aa5a0" : "#2E7D78", hair: ageIdx >= 3 ? "#5d4d3d" : "#1d1108" });
+    if (yr >= 7 && yr < 10)
+      s += `<g><path d="M232 150 q18 16 36 0 l-3 12 q-15 10 -30 0 Z" fill="#8a5a2b" stroke="${ink}" stroke-width="2.4"/><circle cx="250" cy="146" r="8" fill="#C68B59" stroke="${ink}" stroke-width="2.2"/><path d="M242 146 q8 -10 16 0" fill="#1d1108"/></g>`; // baby cradle
+    if (yr >= 10)
+      s += svgGirl(252, 150, yr >= 15 ? 1.35 : 1.0, { frock: "#F5A800", book: yr >= 15 && !S.flags.eduPulled });
+    s += `</svg>`;
+    return `<div class="stage-wrap ${cls || ""}">${s}</div>`;
+  }
+
+  /* replay collection */
+  function endingsSeen() {
+    try { return JSON.parse(localStorage.getItem("meena_endings") || "[]"); } catch (e) { return []; }
+  }
   function renderAlbum() {
     const tone = albumTone();
-    const rooms = { good: "🛏️🪟🧺🖼️🌼", mid: "🛏️🪟🧺", bad: "🛏️🕳️" };
     shell(`
       <div class="album">
         <h3>${esc(t("album.t", { y: chapter().year }))}</h3>
-        <div class="room">${rooms[tone]}</div>
+        ${stageSVG("")}
         <p>${esc(t("album." + tone))}</p>
         <span class="stat">${esc(t("album.stats", { a: rupees(totalAssets()), d: rupees(S.debt) }))}</span>
       </div>`,
@@ -560,8 +663,13 @@
     if (S.flags.eduPulled) extra.push(t("end.eduPulled"));
     if (S.flags.mentor) extra.push(t("end.mentor"));
     if (S.flags.widowed) extra.push(t("end.widow"));
+    const seen = endingsSeen();
+    if (seen.indexOf(E.tier) < 0) { seen.push(E.tier); try { localStorage.setItem("meena_endings", JSON.stringify(seen)); } catch (e) {} }
+    const collectRow = [1,2,3,4].map(i =>
+      `<span class="collect ${seen.indexOf(i) >= 0 ? "on" : ""}">${seen.indexOf(i) >= 0 ? {1:"🕳️",2:"🌧️",3:"🌤️",4:"🌟"}[i] : "🔒"}</span>`).join("");
     shell(`
       <div class="chapter-card"><h2>${esc(t("end.t"))}</h2></div>
+      ${stageSVG("")}
       <div class="album tier-${E.tier}">
         <div class="tier-badge">${badges[E.tier]}</div>
         <h3>${esc(t("end.tier" + E.tier + ".t"))}</h3>
@@ -576,6 +684,11 @@
         <div class="speaker">${esc(t("ui.lessonsTitle"))}</div>
         <ul class="lesson-list">${E.lessons.map(k => `<li>${esc(t(k))}</li>`).join("")}</ul>
         <p style="font-size:13px;opacity:.75;">${esc(t("ui.madeWith"))}</p>
+      </div>
+      <div class="scene" style="text-align:center;">
+        <div class="speaker">${esc(t("ui.collection", { x: seen.length }))}</div>
+        <div class="collect-row">${collectRow}</div>
+        <p style="font-size:14px;">${esc(t("ui.collectionHint"))}</p>
       </div>
       <canvas id="shareCanvas" width="1080" height="1080"></canvas>`,
       t("ui.share"), () => shareCard(E),
@@ -620,11 +733,11 @@
     try {
       const res = await fetch("data/story.json");
       STORY = await res.json();
-      const lang = localStorage.getItem(LANG_KEY) || "en";
+      const lang = localStorage.getItem(LANG_KEY) || "hi";
       await loadLang(lang);
       const saved = loadSave();
       if (saved) { S = saved; if (S.lang) await loadLang(S.lang); }
-      if (S) S.lang = localStorage.getItem(LANG_KEY) || "en";
+      if (S) S.lang = localStorage.getItem(LANG_KEY) || "hi";
       renderTitle();
     } catch (e) {
       app.innerHTML = "<div class='boot'><p>Could not load game files. If you opened index.html directly, please run a local server (see SETUP_GUIDE.md) or deploy to Netlify/GitHub Pages.</p></div>";
