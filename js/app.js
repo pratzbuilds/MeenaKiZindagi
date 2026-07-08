@@ -271,10 +271,21 @@
   function wireSchemeTags() {
     document.querySelectorAll(".scheme-tag").forEach(el => el.onclick = (e) => {
       e.stopPropagation();
-      const old = document.querySelector(".scheme-pop");
-      if (old) old.remove();
-      if (el.nextElementSibling && el.nextElementSibling.className === "scheme-pop") return;
-      el.insertAdjacentHTML("afterend", `<span class="scheme-pop">${esc(t("scheme." + el.dataset.s))}</span>`);
+      const wasOpen = el.classList.contains("on");
+      // close every popup + de-highlight every tag
+      document.querySelectorAll(".scheme-pop").forEach(p => p.remove());
+      document.querySelectorAll(".scheme-tag.on").forEach(b => b.classList.remove("on"));
+      if (wasOpen) return; // tapping the same tag again closes it
+      // find the nearest block-level container (.scene or .options) and append the popup AFTER it
+      const container = el.closest(".scene, .options, .feedback, .learnmore") || el.parentElement;
+      const pop = document.createElement("div");
+      pop.className = "scheme-pop";
+      pop.innerHTML = `<button class="scheme-pop-close" aria-label="close">×</button>${esc(t("scheme." + el.dataset.s))}`;
+      container.parentNode.insertBefore(pop, container.nextSibling);
+      el.classList.add("on");
+      pop.querySelector(".scheme-pop-close").onclick = (ev) => {
+        ev.stopPropagation(); pop.remove(); el.classList.remove("on");
+      };
       sfx.click();
     });
   }
