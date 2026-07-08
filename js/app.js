@@ -7,7 +7,7 @@
 (function () {
   "use strict";
 
-  const SAVE_KEY = "meena_save_v2";
+  const SAVE_KEY = "meena_save_v4";
   const LANG_KEY = "meena_lang";
   const MUTE_KEY = "meena_mute";
 
@@ -15,6 +15,7 @@
   let L = {};              // current language strings
   let S = null;            // game state
   const app = document.getElementById("app");
+  function track(ev) { try { if (window.meenaTrack) window.meenaTrack(ev); } catch (e) {} }
 
   /* ---------------- i18n ---------------- */
   function charFirstName() {
@@ -169,12 +170,26 @@
         if (S.pots.scam > 0) { S.pots.scam = 0; S.tension += 15; S.news.push("scamGone"); }
         else S.news.push("scamDodged");
       }
+      checkMilestones();
       // gentle drift
       S.tension = Math.max(0, S.tension - 4);
       S.health = Math.min(100, S.health + 1);
       S.tensionSum += S.tension; S.tensionN++;
       clampMeters();
     }
+  }
+
+  /* ---------------- savings milestones (visible rewards) ---------------- */
+  const MILESTONES = [[1,"fan"],[3,"bed"],[6,"tv"],[9,"fridge"],[12,"wash"],[18,"paint"]];
+  function checkMilestones() {
+    const m = totalAssets() / monthlyExpense();
+    MILESTONES.forEach(([months, id]) => {
+      if (m >= months && !S.flags["mile_" + id]) {
+        S.flags["mile_" + id] = true;
+        S.news.push("mile." + id);
+        track("milestone_" + id);
+      }
+    });
   }
 
   /* ---------------- events (shocks) ---------------- */
@@ -245,6 +260,24 @@
 
   /* ---------------- rendering ---------------- */
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+  const SCHEMES = { "PMJJBY":"pmjjby", "PMSBY":"pmsby", "PM-JAY":"pmjay", "APY":"apy", "SSY":"ssy", "eShram":"eshram" };
+  function schemeify(escaped) {
+    // wrap scheme acronyms in tappable chips that reveal a one-line explanation
+    let out = escaped;
+    for (const acro in SCHEMES)
+      out = out.split(acro).join(`<button class="scheme-tag" data-s="${SCHEMES[acro]}">${acro} ⓘ</button>`);
+    return out;
+  }
+  function wireSchemeTags() {
+    document.querySelectorAll(".scheme-tag").forEach(el => el.onclick = (e) => {
+      e.stopPropagation();
+      const old = document.querySelector(".scheme-pop");
+      if (old) old.remove();
+      if (el.nextElementSibling && el.nextElementSibling.className === "scheme-pop") return;
+      el.insertAdjacentHTML("afterend", `<span class="scheme-pop">${esc(t("scheme." + el.dataset.s))}</span>`);
+      sfx.click();
+    });
+  }
   function yearBarHTML() {
     const markers = STORY.chapters.map(c => c.year);
     const pct = Math.min(100, Math.round((S.year - 1) / 19 * 100));
@@ -346,7 +379,24 @@
     });
     const c = document.getElementById("contBtn");
     if (c) c.onclick = () => { S = loadSave(); route(); };
-    document.getElementById("newBtn").onclick = () => { sfx.click(); renderSetup(); };
+    document.getElementById("newBtn").onclick = () => { sfx.click(); renderIntro(); };
+  }
+
+  /* ---------------- intro / welcome (V4) ---------------- */
+  function renderIntro() {
+    app.innerHTML = `
+    <div class="title-screen intro-screen">
+      <h1 style="font-size:24px;">${esc(t("intro.welcome"))}</h1>
+      <div class="intro-card"><p>${esc(t("intro.what"))}</p></div>
+      <div class="intro-card how"><p>${esc(t("intro.how1"))}</p></div>
+      <div class="intro-card how"><p>${esc(t("intro.how2"))}</p></div>
+      <div class="intro-card how"><p>${esc(t("intro.how3"))}</p></div>
+      <div class="bottombar" style="position:relative;padding:16px 0 0;background:none;transform:none;left:0;">
+        <button class="btn-primary" id="introBtn">${esc(t("intro.btn"))}</button>
+      </div>
+      <p class="disclaimer">${esc(t("ui.disclaimer"))}</p>
+    </div>`;
+    document.getElementById("introBtn").onclick = () => { sfx.good(); renderSetup(); };
   }
 
   function renderSetup() {
@@ -373,7 +423,8 @@
       document.querySelectorAll(".char-card").forEach(el => el.onclick = () => { charId = el.dataset.c; sfx.click(); draw(); });
       document.querySelectorAll(".income-btn").forEach(el => el.onclick = () => { incomeIdx = +el.dataset.i; sfx.click(); draw(); });
       document.getElementById("beginBtn").onclick = () => {
-        S = newState(charId, incomeIdx); sfx.good(); save(); route();
+        S = newState(charId, incomeIdx); sfx.good(); save();
+        track("game_start"); route();
       };
     }
     draw();
@@ -399,6 +450,7 @@
 
   function renderChapterIntro() {
     const ch = chapter();
+    track("chapter_" + (S.chapterIdx + 1));
     const char = STORY.characters.find(c => c.id === S.charId);
     shell(`
       <div class="chapter-card">
@@ -420,10 +472,11 @@
 
   function renderNews() {
     const n = S.news.shift();
+    const isMile = n.indexOf("mile.") === 0;
     shell(`
-      <div class="scene chat">
-        <div class="speaker">📰 ${esc(t("news." + n + ".t"))}</div>
-        <p>${esc(t("news." + n + ".b"))}</p>
+      <div class="scene chat ${isMile ? "milestone" : ""}">
+        <div class="speaker">${isMile ? "🎉 " + esc(t("mile.t")) : "📰 " + esc(t("news." + n + ".t"))}</div>
+        <p>${esc(isMile ? t(n) : t("news." + n + ".b"))}</p>
       </div>`,
       t("ui.next"), () => {
         if (S.news.length) { S.phase = "news"; }
@@ -431,7 +484,7 @@
         else { S.phase = "screen"; S.screenIdx = Math.max(0, S.screenIdx); }
         route();
       });
-    sfx.sting();
+    isMile ? sfx.win() : sfx.sting();
   }
 
   function renderEvent() {
@@ -456,23 +509,43 @@
     sfx.sting();
   }
 
+  function savingsValue() {
+    // realisable value of non-cash pots (chit pays out at 80%, gold at 90%)
+    const p = S.pots;
+    return p.rd + p.sip + p.ssy + p.endowment + Math.round(p.chit * 0.8) + Math.round(p.gold * 0.9);
+  }
+  function drawFromSavings(amount) {
+    // withdraw in order: rd → gold → endowment → sip → chit → ssy (daughter's fund last)
+    let need = amount;
+    const order = [["rd",1],["gold",0.9],["endowment",1],["sip",1],["chit",0.8],["ssy",1]];
+    for (const [pot, factor] of order) {
+      if (need <= 0) break;
+      const avail = Math.round(S.pots[pot] * factor);
+      if (avail <= 0) continue;
+      const take = Math.min(avail, need);
+      S.pots[pot] = Math.max(0, S.pots[pot] - Math.round(take / factor));
+      if (S.pots[pot] === 0) delete S.autos[pot];
+      if (pot === "chit" && S.pots.chit === 0) S.chitDone = true;
+      need -= take;
+    }
+    return amount - need; // actually raised
+  }
   function renderFunding() {
     const short = S.pendingShortfall;
+    const sav = savingsValue();
     const opts = [];
+    // SAVINGS FIRST — borrowing is the last resort
+    if (sav >= short && (totalAssets() - short) >= 6 * monthlyExpense()) {
+      opts.push({ id: "surplus", emoji: "💪", fb: "fund.surplusfb", good: true, act: () => { drawFromSavings(short); } });
+    } else if (sav >= short) {
+      opts.push({ id: "cash", emoji: "🪔", fb: "fund.cashfb", good: true, act: () => { drawFromSavings(short); } });
+    } else if (sav > 0) {
+      opts.push({ id: "partial", emoji: "🤝", fb: "fund.partialfb", good: true, act: () => {
+        const got = drawFromSavings(sav); S.debt += short - got;
+      }});
+    }
     opts.push({ id: "sahukar", emoji: "🧔", fb: "fund.sahukarfb", act: () => { S.debt += short; } });
     opts.push({ id: "app", emoji: "📱", fb: "fund.appfb", act: () => { S.debt += short; } });
-    if (S.pots.chit > 0) opts.push({ id: "chit", emoji: "🧕", fb: "fund.chitfb", act: () => {
-      const got = Math.round(S.pots.chit * 0.8); S.pots.chit = 0; delete S.autos.chit; S.chitDone = true;
-      if (got < short) S.debt += short - got; else S.pots.cash += got - short;
-    }});
-    if (S.pots.gold > 0) opts.push({ id: "gold", emoji: "🪙", fb: "fund.goldfb", act: () => {
-      const got = Math.round(S.pots.gold * 0.9); S.pots.gold = 0;
-      if (got < short) S.debt += short - got; else S.pots.cash += got - short;
-    }});
-    if (S.pots.sip > 0) opts.push({ id: "sip", emoji: "🌱", fb: "fund.sipfb", act: () => {
-      const got = S.pots.sip; S.pots.sip = 0; delete S.autos.sip;
-      if (got < short) S.debt += short - got; else S.pots.cash += got - short;
-    }});
     shell(`
       <div class="scene">
         <div class="speaker">🆘</div>
@@ -486,9 +559,9 @@
     document.querySelectorAll(".opt").forEach(el => el.onclick = () => {
       const o = opts[+el.dataset.i];
       o.act(); S.pendingShortfall = 0; clampMeters(); save();
-      (o.id === "sahukar" || o.id === "app") ? sfx.bad() : sfx.coin();
+      (o.id === "sahukar" || o.id === "app") ? sfx.bad() : (o.good ? sfx.good() : sfx.coin());
       document.getElementById("fbArea").innerHTML =
-        `<div class="feedback ${o.id === "sahukar" || o.id === "app" ? "bad" : "neutral"}">${esc(t(o.fb))}</div>`;
+        `<div class="feedback ${o.id === "sahukar" || o.id === "app" ? "bad" : o.good ? "good" : "neutral"}">${esc(t(o.fb))}</div>`;
       document.querySelectorAll(".opt").forEach(b => b.disabled = true);
       app.insertAdjacentHTML("beforeend",
         `<div class="bottombar"><button class="btn-primary" id="mainBtn">${esc(t("ui.next"))}</button></div>`);
@@ -516,28 +589,31 @@
       ${stageSVG("slim")}
       <div class="scene chat">
         <div class="big-emoji">${sc.emoji || "💬"}</div>
-        <p>${esc(t(sc.id + ".q"))}</p>
+        <p>${schemeify(esc(t(sc.id + ".q")))}</p>
       </div>
       <div class="options">
         ${opts.map((o, i) => `<button class="opt" data-i="${i}">
           <span class="opt-emoji">${o.emoji}</span>
-          <span>${esc(t(sc.id + "." + o.id))}</span>
+          <span>${schemeify(esc(t(sc.id + "." + o.id)))}</span>
           ${o.costLabel ? `<span class="opt-cost">${esc(o.costLabel)}</span>` : ""}
         </button>`).join("")}
       </div>
       <div id="fbArea"></div>`);
+    wireSchemeTags();
     document.querySelectorAll(".opt").forEach(el => el.onclick = () => {
       const o = opts[+el.dataset.i];
       applyEffects(o.effects);
+      checkMilestones();
       if (sc.id === "c6s1") S.scamSeen = true;
       save();
       o.tone === "good" ? (coinDrop(), sfx.good()) : o.tone === "bad" ? sfx.bad() : sfx.click();
       document.querySelectorAll(".opt").forEach(b => { b.disabled = true; if (b !== el) b.style.opacity = .45; });
-      let fb = `<div class="feedback ${o.tone}">${esc(t(sc.id + "." + o.id + "fb"))}</div>`;
+      let fb = `<div class="feedback ${o.tone}">${schemeify(esc(t(sc.id + "." + o.id + "fb")))}</div>`;
       if (sc.learnmore) fb += `<button class="learnmore-btn" id="lmBtn">${esc(t("ui.aurSamjho"))}</button><div id="lmArea"></div>`;
       document.getElementById("fbArea").innerHTML = fb;
       // refresh topbar numbers
       document.querySelector(".topbar").outerHTML = topbarHTML(); wireTopbar();
+      wireSchemeTags();
       const lmBtn = document.getElementById("lmBtn");
       if (lmBtn) lmBtn.onclick = () => {
         document.getElementById("lmArea").innerHTML = `
@@ -634,7 +710,8 @@
   }
   function stageSVG(cls) {
     const ink = "#2E1E12", tone = albumTone(), yr = S.year;
-    const wall = tone === "bad" ? "#D9C6A4" : tone === "mid" ? "#F3DBAB" : "#FBE6B4";
+    let wall = tone === "bad" ? "#D9C6A4" : tone === "mid" ? "#F3DBAB" : "#FBE6B4";
+    if (S.flags.mile_paint) wall = "#CFE8D8"; // freshly painted — mint green
     const gLevel = Math.min(88, Math.round(totalAssets() / (12 * monthlyExpense()) * 100));
     let s = `<svg class="${cls || ""}" viewBox="0 0 360 200" xmlns="http://www.w3.org/2000/svg" role="img">`;
     s += `<rect width="360" height="200" fill="${wall}"/>`;
@@ -655,8 +732,13 @@
     const photos = Math.min(4, Math.floor(yr / 5));
     for (let i = 0; i < photos; i++)
       s += `<rect x="${128 + i * 16}" y="40" width="12" height="15" fill="#fff" stroke="${ink}" stroke-width="2"/><rect x="${130.5 + i * 16}" y="44" width="7" height="8" fill="${["#D6336C","#146B6A","#F5A800","#4C8C2B"][i]}"/>`;
-    if (tone === "good" && yr >= 9)
-      s += `<rect x="196" y="96" width="34" height="62" rx="4" fill="#E4573D" stroke="${ink}" stroke-width="3"/><line x1="199" y1="120" x2="227" y2="120" stroke="${ink}" stroke-width="2.5"/><circle cx="222" cy="110" r="2" fill="${ink}"/>`; // fridge
+    // V4: possessions appear as savings milestones are reached
+    const F = S.flags;
+    if (F.mile_fan)  s += `<g><line x1="180" y1="0" x2="180" y2="12" stroke="${ink}" stroke-width="2.5"/><circle cx="180" cy="14" r="3" fill="${ink}"/><ellipse cx="166" cy="15" rx="12" ry="4" fill="#C9CED6" stroke="${ink}" stroke-width="2"/><ellipse cx="194" cy="15" rx="12" ry="4" fill="#C9CED6" stroke="${ink}" stroke-width="2"/></g>`;
+    if (F.mile_bed)  s += `<g><rect x="290" y="132" width="62" height="14" rx="3" fill="#8a5a2b" stroke="${ink}" stroke-width="2.4"/><rect x="292" y="124" width="24" height="10" rx="4" fill="#fff" stroke="${ink}" stroke-width="2"/><rect x="290" y="146" width="5" height="12" fill="#5d3a1a"/><rect x="347" y="146" width="5" height="12" fill="#5d3a1a"/></g>`;
+    if (F.mile_tv)   s += `<g><rect x="216" y="60" width="34" height="22" rx="2" fill="#20242a" stroke="${ink}" stroke-width="2.4"/><rect x="220" y="64" width="26" height="14" fill="#7fd0cb"/><rect x="228" y="82" width="10" height="4" fill="${ink}"/></g>`;
+    if (F.mile_fridge) s += `<rect x="196" y="96" width="34" height="62" rx="4" fill="#E4573D" stroke="${ink}" stroke-width="3"/><line x1="199" y1="120" x2="227" y2="120" stroke="${ink}" stroke-width="2.5"/><circle cx="222" cy="110" r="2" fill="${ink}"/>`;
+    if (F.mile_wash) s += `<g><rect x="300" y="96" width="30" height="38" rx="3" fill="#DDE4EA" stroke="${ink}" stroke-width="2.6"/><circle cx="315" cy="117" r="9" fill="#9CC5C2" stroke="${ink}" stroke-width="2.2"/><circle cx="306" cy="101" r="1.8" fill="${ink}"/><circle cx="312" cy="101" r="1.8" fill="${ink}"/></g>`;
     if (tone === "bad") {
       s += `<path d="M40 14 l7 12 -5 9 8 12" stroke="#8f7a58" stroke-width="3" fill="none" stroke-linecap="round"/>`; // crack
       s += `<path d="M226 30 q26 12 52 0" stroke="${ink}" stroke-width="1.6" fill="none"/><path d="M238 30 l0 8 M252 31 l0 10 M266 30 l0 7" stroke="${ink}" stroke-width="1.4"/>`; // clothesline
@@ -671,8 +753,10 @@
       hair: ageIdx >= 3 ? "#5d4d3d" : "#1d1108", grey: ageIdx >= 2,
       smile: tone !== "bad"
     });
-    if (yr >= 5 && !S.flags.widowed)
+    if (!S.flags.widowed)
       s += svgMan(150, 152, 1.24, { kurta: tone === "bad" ? "#9aa5a0" : "#2E7D78", hair: ageIdx >= 3 ? "#5d4d3d" : "#1d1108" });
+    // mother-in-law — part of the household from day 1
+    s += svgWoman(36, 152, 1.12, { sari: "#8a6d3b", blouse: "#B98A5A", skin: "#B57B4B", hair: "#7d6d5d", grey: true, smile: tone !== "bad" });
     if (yr >= 7 && yr < 10)
       s += `<g><path d="M232 150 q18 16 36 0 l-3 12 q-15 10 -30 0 Z" fill="#8a5a2b" stroke="${ink}" stroke-width="2.4"/><circle cx="250" cy="146" r="8" fill="#C68B59" stroke="${ink}" stroke-width="2.2"/><path d="M242 146 q8 -10 16 0" fill="#1d1108"/></g>`; // baby cradle
     if (yr >= 10)
@@ -701,6 +785,7 @@
   /* ---------------- ending + share ---------------- */
   function renderEnding() {
     const E = computeEnding();
+    track("ending_tier_" + E.tier);
     const badges = { 1: "🕳️", 2: "🌧️", 3: "🌤️", 4: "🌟" };
     const extra = [];
     if (S.flags.eduKept) extra.push(t("end.edu"));
@@ -735,7 +820,7 @@
         <p style="font-size:14px;">${esc(t("ui.collectionHint"))}</p>
       </div>
       <canvas id="shareCanvas" width="1080" height="1080"></canvas>`,
-      t("ui.share"), () => shareCard(E),
+      t("ui.share"), () => { track("share_clicked"); shareCard(E); },
       { label: t("ui.playAgain"), fn: () => { localStorage.removeItem(SAVE_KEY); S = null; renderTitle(); } });
     E.tier >= 3 ? sfx.win() : sfx.sting();
   }
@@ -757,7 +842,8 @@
     x.fillText(t("share.cardBottom"), 540, 950);
     cv.toBlob(async (blob) => {
       const file = new File([blob], "meena-result.png", { type: "image/png" });
-      const text = t("share.text", { tier: t("end.tier" + E.tier + ".t"), a: rupees(E.assets) }) + " " + location.href;
+      const shareUrl = location.origin + location.pathname + "?src=share";
+      const text = t("share.text", { tier: t("end.tier" + E.tier + ".t"), a: rupees(E.assets) }) + " " + shareUrl;
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         try { await navigator.share({ files: [file], text }); return; } catch (e) {}
       }

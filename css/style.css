@@ -324,3 +324,33 @@ body{
   box-shadow:3px 3px 0 var(--shadow); opacity:.45;
 }
 .collect.on{opacity:1; background:var(--paper-2);}
+
+/* ============ V4 additions ============ */
+/* intro screen */
+.intro-screen { padding-top: 26px; }
+.intro-card {
+  background: #fff; border: 2.5px solid #2E1E12; border-radius: 14px;
+  padding: 12px 14px; margin: 10px 0; text-align: left;
+  box-shadow: 3px 3px 0 rgba(46,30,18,.15); font-size: 15px;
+}
+.intro-card.how { background: #FFF3DC; font-size: 14px; }
+.disclaimer { font-size: 11px; opacity: .6; margin-top: 16px; line-height: 1.4; }
+
+/* tappable scheme acronyms */
+.scheme-tag {
+  display: inline; border: none; background: none; padding: 0;
+  color: #146B6A; font-weight: 700; font-family: inherit; font-size: inherit;
+  text-decoration: underline dotted; cursor: pointer;
+}
+.scheme-pop {
+  display: block; background: #E7F4F3; border: 2px solid #146B6A;
+  border-radius: 10px; padding: 8px 10px; margin: 6px 0;
+  font-size: 13px; line-height: 1.45; color: #0e4a49;
+}
+
+/* milestone celebration */
+.scene.milestone {
+  background: #E9F6E4; border-color: #4C8C2B;
+  animation: milePop .5s ease;
+}
+@keyframes milePop { 0% { transform: scale(.92); } 60% { transform: scale(1.03); } 100% { transform: scale(1); } }

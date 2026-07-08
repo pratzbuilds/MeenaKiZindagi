@@ -1,11 +1,12 @@
 /* Meena ki Zindagi — service worker (offline support)
    To force an update after editing game files: change the CACHE version below. */
-const CACHE = "meena-v3";
+const CACHE = "meena-v4";
 const FILES = [
   "./",
   "./index.html",
   "./css/style.css",
   "./js/app.js",
+  "./js/track.js",
   "./data/story.json",
   "./data/lang/en.json",
   "./data/lang/hi.json",
